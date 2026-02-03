@@ -1,0 +1,13 @@
+
+//add android
+npx cap add android
+
+if naay update sa web base e run para maimport sa android
+npx cap sync 
+
+//open app in android studio run
+
+npx cap open android
+
+
+npm install -g @capacitor/assets

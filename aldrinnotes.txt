@@ -1,0 +1,4 @@
+test direct receiving
+not show picture in cart sidebar
+auto hide cart side after create mrf
+in complete in mrf image is optional
