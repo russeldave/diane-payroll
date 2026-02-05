@@ -183,75 +183,64 @@ const togglePasswordVisibility = () => {
 // Login function
 const login = async () => {
   try {
-    // Show the processing SweetAlert modal
     Swal.fire({
       title: "Processing...",
       text: "Checking credentials...",
-      didOpen: () => {
-        Swal.showLoading();
-      },
-      allowOutsideClick: false, // Disable click outside to dismiss
+      didOpen: () => Swal.showLoading(),
+      allowOutsideClick: false,
     });
 
-    errors.value = {}; // Clear errors after successful submission
+    errors.value = {};
 
-    const formData = FormDx(form.value);
-    const response = await axios.post(`${VUE_APP_API_URL}login`, formData);
+    await axios.get('/sanctum/csrf-cookie');
 
-    if (response.data && response.data.token && response.data.userInfo) {
-      const { token, userInfo } = response.data;
+   // Step 2: Login
+    const response = await axios.post('login', {
+      username: form.value.username,
+      password: form.value.password
+    });
 
-      // Save the session in Pinia store
-      sessionStore.setSession(userInfo, token, []);
+    if (response.data?.user) {
+      const userInfo = response.data.user;
+      localStorage.setItem("user", userInfo);
+      // Save session
+      sessionStore.setSession(userInfo);
 
-      // After successful login, change the message to loading preloaded data
       Swal.fire({
         title: "Loading Preloaded Data...",
         text: "Please wait while we prepare your account.",
-        didOpen: () => {
-          Swal.showLoading();
-        },
-        allowOutsideClick: false, // Disable click outside to dismiss
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
       });
 
-      // Fetch necessary data after successful login
-      await preProcess(token);
-
-      // Simulate a slight delay to show overlay before navigation
       setTimeout(() => {
-        // Close the processing modal
         Swal.close();
-        // Redirect to dashboard or desired route
-        const loginRedirect = userInfo[0].defaultUri ?? "request-ingredient";
-        window.location.replace(loginRedirect);
-      }, 1000); // Adjust delay as needed
+        window.location.replace(
+          userInfo.defaultUri || "/request-ingredient"
+        );
+      }, 1000);
+
     } else {
-      // Handle login failure
-      Swal.close(); // Close the processing modal
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: response.data.message,
-        confirmButtonText: "Retry",
-      });
+      throw new Error("Invalid login response");
     }
+
   } catch (error) {
-    // Handle error during login
     console.error("Login error:", error);
-    Swal.close(); // Close the processing modal
+    Swal.close();
 
-    if (error.response && error.response.data.errors) {
-      errors.value = error.response.data.errors; // Store Laravel validation errors
+    if (error.response?.data?.errors) {
+      errors.value = error.response.data.errors;
     } else {
-      errors.value.message = error.response?.data?.message || "Something went wrong.";
+      errors.value.message =
+        error.response?.data?.message || "Invalid credentials";
     }
 
-    // Automatically hide errors after 3 seconds
     setTimeout(() => {
       errors.value = {};
     }, 3000);
   }
 };
+
 
 // Preprocess necessary data after successful login
 const preProcess = async (token) => {

@@ -1,41 +1,40 @@
-// sessionStore.js
 import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import axios from 'axios';
 
-export const useSessionStore = defineStore('session', {
-  state: () => ({
-    user: null,
-    token: null,
-    warehouses: null
-  }),
+export const useSessionStore = defineStore('session', () => {
+  const user = ref(null);
+  const loading = ref(false);
 
-  actions: {
-    setSession(user, token, userHasWarehouses) {
-      this.user = user;
-      this.token = token;
-      this.warehouses = userHasWarehouses;
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
-      localStorage.setItem('warehouses', JSON.stringify(userHasWarehouses));
-    },
+  const isAuthenticated = computed(() => !!user.value);
 
-    clearSession() {
-      this.user = null;
-      this.token = null;
-      this.warehouses = null;
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      localStorage.removeItem('warehouses');
-    },
+  const setSession = (userInfo) => {
+    user.value = userInfo;
+  };
 
-    restoreSession() {
-      const storedUser = localStorage.getItem('user');
-      const storedToken = localStorage.getItem('token');
-      const storedWarehouse = localStorage.getItem('warehouses');
-      if (storedUser && storedToken) {
-        this.user = JSON.parse(storedUser);
-        this.warehouses = JSON.parse(storedWarehouse);
-        this.token = storedToken;
-      }
-    },
-  },
+  const clearUser = () => {
+    user.value = null;
+  };
+
+  // 🔥 This is the KEY for new tabs
+  const fetchSession = async () => {
+    try {
+      loading.value = true;
+      const res = await axios.get('/api/me');
+      user.value = res.data.user;
+    } catch (e) {
+      user.value = null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return {
+    user,
+    loading,
+    isAuthenticated,
+    setSession,
+    clearUser,
+    fetchSession
+  };
 });

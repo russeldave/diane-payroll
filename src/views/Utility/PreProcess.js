@@ -4,13 +4,12 @@ import { VUE_APP_API_URL } from "./Global";
 import { FormDx, BearToken } from "./Helper";
 
 // require token
-export const getPermissions = async (token = "") => {
+export const getPermissions = async () => {
   try {
     const formData = FormDx({ id: 0 });
     const response = await axios.post(
-      `${VUE_APP_API_URL}users/get-user-permissions`,
-      formData,
-      BearToken(token)
+      `api/users/get-user-permissions`,
+      formData
     );
     if (response) {
       const encryptedData = encryptData(response.data.permissions);
@@ -21,13 +20,12 @@ export const getPermissions = async (token = "") => {
     return []; // You may want to handle errors more gracefully based on your use case
   }
 };
-export const getRoles = async (token = "") => {
+export const getRoles = async () => {
   try {
     const formData = FormDx({ id: 0 });
     const response = await axios.post(
-      `${VUE_APP_API_URL}roles/all-roles-dropdown`,
-      formData,
-      BearToken(token)
+      `api/roles/all-roles-dropdown`,
+      formData
     );
     if (response) {
       const encryptedData = encryptData(response.data.roles);
@@ -43,9 +41,8 @@ export const getUnits = async (token = "") => {
   try {
     const formData = FormDx({ id: 0 });
     const response = await axios.post(
-      `${VUE_APP_API_URL}units/dropdown`,
-      formData,
-      BearToken(token)
+      `api/units/dropdown`,
+      formData
     );
     if (response) {
       const encryptedData = encryptData(response.data.units);

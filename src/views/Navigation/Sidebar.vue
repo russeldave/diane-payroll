@@ -127,7 +127,7 @@
         />
         <div class="ms-4">
           <p class="text-lg font-bold text-white uppercase">{{ user[0].name }}</p>
-          <p class="text-sm text-gray-300 text-white">{{ user[0].roleName }}</p>
+          <!-- <p class="text-sm text-gray-300 text-white">{{ user[0].roleName }}</p> -->
           <p class="text-xs text-gray-300 text-white">{{ user[0].email }}</p>
           <div class="flex flex-row gap-2">
             <RouterLink to="/profile">
@@ -267,7 +267,7 @@ import profilePicture from "@/assets/images/profile/profile.png";
 // Define the emits for this component
 const emits = defineEmits(["openDrawer", "warehouseChanged"]);
 
-const user = JSON.parse(localStorage.getItem("user"));
+const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
 const outOfStockCount = ref(13);
 const sessionStore = useSessionStore();
@@ -319,9 +319,7 @@ const logOut = async () => {
     });
 
     const response = await axios.post(
-      VUE_APP_API_URL + "logout",
-      { id: 0 },
-      BearToken(token)
+      "logout"
     );
 
     if (response) {
@@ -402,7 +400,7 @@ const reloadDefault = async () => {
   try {
     // Reload all default data
     // await getDefaultWarehouse(token);
-    await getPermissions(token);
+    await getPermissions();
     await getRoles(token);
     await getUnits(token);
 

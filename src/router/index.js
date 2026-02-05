@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import GuestLayout from '@/layouts/GuestLayout.vue';
+import { useSessionStore } from '@/stores/sessionStore';
 import Login from '@/views/Auth/Index.vue';
 import Register from '@/views/Auth/Register.vue';
 //admin
@@ -326,11 +327,21 @@ const routes = [
         meta: { title: titleFormat('Test Datatable') }
       }
     ],
-    beforeEnter: (to, from, next) => {
-      if (!token) {
-        next({ name: 'login' });
-      } else {
+    beforeEnter: async (to, from, next) => {
+      const sessionStore = useSessionStore();
+    
+      // If already authenticated, allow
+      if (sessionStore.isAuthenticated) {
+        return next();
+      }
+    
+      // Otherwise try to restore session from backend
+      await sessionStore.fetchSession();
+    
+      if (sessionStore.isAuthenticated) {
         next();
+      } else {
+        next({ name: 'login' });
       }
     }
   },
