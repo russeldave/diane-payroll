@@ -75,7 +75,9 @@
             <div class="flex space items-center space-x-1">
               <!-- <StoreDropdown /> -->
               <WarehouseDropdown @warehouseChanged="onWarehouseChange" />
-              <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
+              <div
+                class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200"
+              >
                 <!-- <UserQr /> -->
               </div>
               <!-- <ZoomControls /> -->
@@ -126,9 +128,9 @@
           class="w-12 h-12 rounded-full border-2 border-slate-500"
         />
         <div class="ms-4">
-          <p class="text-lg font-bold text-white uppercase">{{ user[0].name }}</p>
-          <!-- <p class="text-sm text-gray-300 text-white">{{ user[0].roleName }}</p> -->
-          <p class="text-xs text-gray-300 text-white">{{ user[0].email }}</p>
+          <p class="text-lg font-bold text-white uppercase">{{ user.name }}</p>
+          <!-- <p class="text-sm text-gray-300 text-white">{{ user.roleName }}</p> -->
+          <p class="text-xs text-gray-300 text-white">{{ user.email }}</p>
           <div class="flex flex-row gap-2">
             <RouterLink to="/profile">
               <button
@@ -139,12 +141,15 @@
                 <span class="ms-2">Edit Profile</span>
               </button>
             </RouterLink>
-            <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
-            <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
-             <!-- <UserBarcode /> -->
-          </div>
-            <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
-           
+            <div
+              class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200"
+            >
+              <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
+              <!-- <UserBarcode /> -->
+            </div>
+            <div
+              class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200"
+            >
               <!-- <UserQr /> -->
             </div>
           </div>
@@ -318,9 +323,7 @@ const logOut = async () => {
       },
     });
 
-    const response = await axios.post(
-      "logout"
-    );
+    const response = await axios.post("logout");
 
     if (response) {
       // Preserve theme in localStorage
@@ -333,10 +336,11 @@ const logOut = async () => {
       }
 
       // Clear session storage
-      sessionStorage.clear();
+      sessionStore.clearUser();
 
       // Close the Swal and reload
       Swal.close();
+      window.location.replace("/login");
       location.reload();
     }
   } catch (error) {

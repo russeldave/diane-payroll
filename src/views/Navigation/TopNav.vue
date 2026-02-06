@@ -6,7 +6,6 @@
         class="flex justify-between items-center gap-6 p-2 primary-nav bg-gradient-to-l from-black via-red-600 via-red-700 via-red-500 via-red-700 to-[#800000]"
         :class="{ hidden: hideNav }"
       >
-
         <!-- Logo -->
         <div class="flex justify-start flex-col ml-3">
           <RouterLink
@@ -24,13 +23,17 @@
 
         <!-- Action Buttons -->
         <div class="flex justify-end space-x-1 items-center">
-          <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
+          <div
+            class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200"
+          >
             <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
-             <!-- <UserBarcode /> -->
+            <!-- <UserBarcode /> -->
           </div>
-          <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
+          <div
+            class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200"
+          >
             <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
-             <UserQr />
+            <!-- <UserQr /> -->
           </div>
           <div class="border-r-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
             <p class="text-sm text-gray-200 font-bold text-white uppercase">
@@ -304,9 +307,9 @@ import { BearToken, FormDx, handleApiError, Alert } from "../Utility/Helper";
 import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
 import { navigationConfig } from "../Utility/NavigationConfig";
 
-import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";   
+import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
 import CompanyLogo from "@/views/Component/CompanyLogo.vue";
-import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";  
+import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
 import UserQr from "@/views/Component/modals/UserQr.vue";
 import UserBarcode from "@/views/Component/modals/UserBarcode.vue";
 
@@ -425,9 +428,7 @@ const logOut = async () => {
       },
     });
 
-    const response = await axios.post(
-      "logout"
-    );
+    const response = await axios.post("logout");
 
     if (response) {
       const theme = localStorage.getItem("theme");

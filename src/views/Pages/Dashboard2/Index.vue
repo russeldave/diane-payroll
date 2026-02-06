@@ -1,13 +1,14 @@
 <template>
-  <div v-if="hasPermission('Navigation_Meals_List')">
+  <!-- v-if="hasPermission('Navigation_Meals_List')" -->
+  <div>
     <div class="px-4 min-h-screen rounded-lg dark:border-gray-700 bg-white">
       <!-- <BreadCrumbs :page="'Menu'" /> -->
       <h1 class="text-lg lg:text-2xl font-bold mb-4 mt-1">Menu Management test</h1>
     </div>
   </div>
-  <div v-else>
+  <!-- <div v-else>
     <Error403 />
-  </div>
+  </div> -->
 </template>
 
 <script setup>
@@ -40,9 +41,7 @@ import Error403 from "@/views/Error/403.vue";
 
 const getTest = async () => {
   try {
-    const response = await axios.post(
-      `api/users/test`
-    );
+    const response = await axios.post(`api/users/test`);
   } catch (error) {
     console.error("Error fetching permissions:", error);
     return []; // You may want to handle errors more gracefully based on your use case
@@ -53,6 +52,4 @@ const getTest = async () => {
 onMounted(() => {
   getTest();
 });
-
-
 </script>
