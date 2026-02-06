@@ -4,6 +4,8 @@ import GuestLayout from '@/layouts/GuestLayout.vue';
 import { useSessionStore } from '@/stores/sessionStore';
 import Login from '@/views/Auth/Index.vue';
 import Register from '@/views/Auth/Register.vue';
+
+import Dashboard2Page from '@/views/Pages/Dashboard2/Index.vue';
 //admin
 import ConfigurationMain from '@/views/Pages/Configuration/Index.vue';
 import ChartMain from '@/views/Pages/Charts/Index.vue';
@@ -49,7 +51,7 @@ import DataTableSampleMain from '@/views/Pages/Sample/DataTableSample.vue';
 import MainScanner from '@/views/Pages/BarcodeScanner/MainScanner.vue';
 import FunctionScanner from '@/views/Pages/BarcodeFunction/index.vue'
 
-const token = localStorage.getItem('token');
+// const token = localStorage.getItem('token');
 const title = "FIS Multi-Store";
 
 const titleFormat = (text) => {
@@ -93,6 +95,12 @@ const routes = [
     path: '/',
     component: AdminLayout,
     children: [
+      {
+        path: 'dashboard2',
+        name: 'dashboard2',
+        component: Dashboard2Page,
+        meta: { title: titleFormat('dashboard2') }
+      },
       {
         path: 'payments',
         name: 'payments',
@@ -329,15 +337,11 @@ const routes = [
     ],
     beforeEnter: async (to, from, next) => {
       const sessionStore = useSessionStore();
-    
-      // If already authenticated, allow
-      if (sessionStore.isAuthenticated) {
-        return next();
+
+      if (!sessionStore.isAuthenticated) {
+        await sessionStore.fetchSession();
       }
-    
-      // Otherwise try to restore session from backend
-      await sessionStore.fetchSession();
-    
+
       if (sessionStore.isAuthenticated) {
         next();
       } else {

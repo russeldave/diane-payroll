@@ -14,7 +14,7 @@
     <!-- Top Navigation -->
     <div class="block">
       <Sidebar
-        v-if="isMobile && hasToken"
+        v-if="isMobile"
         :is-open="isDrawerOpen"
         @openDrawer="handleDrawer"
         @warehouseChanged="handleWarehouseChange"
@@ -22,7 +22,7 @@
 
       <!-- Top Navigation (Desktop) -->
       <TopNav
-        v-if="!isMobile && hasToken"
+        v-if="!isMobile"
         @toggleSidebar="handleDrawer(true)"
         @warehouseChanged="handleWarehouseChange"
         @navShowingChanged="handleNavShowingChanged"
@@ -48,7 +48,7 @@ import TopNav from "@/views/Navigation/TopNav.vue";
 const route = useRoute();
 
 // Token check
-const hasToken = !!localStorage.getItem("token");
+// const hasToken = !!localStorage.getItem("token");
 
 // Reactive states
 const isDrawerOpen = ref(false);

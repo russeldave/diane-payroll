@@ -10,6 +10,13 @@ export const navigationConfig = {
       permission: "Navigation_Cashier",
       isLink: true,
     },
+    {
+      id: "dashboard2",
+      title: "Dashboard2",
+      icon: "fa-cash-register",
+      route: "/dashboard2",
+      isLink: true,
+    },
         {
       id: "mrf",
       title: "MRF",

@@ -13,7 +13,7 @@
             to="/system-information"
             class="flex justify-end items-center space-x-0"
           >
-            <CompanyLogo />
+            <!-- <CompanyLogo /> -->
           </RouterLink>
         </div>
 
@@ -26,7 +26,7 @@
         <div class="flex justify-end space-x-1 items-center">
           <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
             <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
-             <UserBarcode />
+             <!-- <UserBarcode /> -->
           </div>
           <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
             <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
@@ -34,10 +34,10 @@
           </div>
           <div class="border-r-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
             <p class="text-sm text-gray-200 font-bold text-white uppercase">
-              {{ user[0].name }}
+              {{ user.name }}
             </p>
             <p class="text-xs text-yellow-600 text-nowrap first-letter:uppercase">
-              {{ user[0].roleName }}
+              {{ user.roleName }}
             </p>
           </div>
           <RouterLink
@@ -74,7 +74,7 @@
             <i class="fa fa-power-off"></i>
           </button>
           <div class="border-l-2 border-l-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
-            <DirectoryButton />
+            <!-- <DirectoryButton /> -->
           </div>
         </div>
       </div>
@@ -426,9 +426,7 @@ const logOut = async () => {
     });
 
     const response = await axios.post(
-      VUE_APP_API_URL + "logout",
-      { id: 0 },
-      BearToken(token)
+      "logout"
     );
 
     if (response) {
@@ -485,9 +483,9 @@ const reloadDefault = async () => {
   });
 
   try {
-    await getPermissions(token);
-    await getRoles(token);
-    await getUnits(token);
+    await getPermissions();
+    // await getRoles(token);
+    // await getUnits(token);
     Swal.close();
     Swal.fire("Success!", "Default data reloaded successfully.", "success");
     window.location.reload();

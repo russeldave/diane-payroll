@@ -41,6 +41,7 @@ const user = reactive({
 
 const assignDefaultWarehouse = async () => {
   loading.value = true; // Show loader
+  return;
   try {
     const formData = FormDx(user);
     const response = await axios.post(
@@ -61,13 +62,13 @@ const assignDefaultWarehouse = async () => {
 };
 
 const loadWarehouses = async () => {
+  return;
   try {
     loading.value = true;
     warehouses.value = [];
     const response = await axios.post(
-      `${VUE_APP_API_URL}users/warehouses-dropdown`,
-      { id: 0 }, // Assuming you want to fetch all warehouses
-      BearToken(token)
+      `api/users/warehouses-dropdown`,
+      { id: 0 }
     );
     warehouses.value = response.data.userWarehouses || [];
     loading.value = false;
@@ -78,6 +79,7 @@ const loadWarehouses = async () => {
 };
 
 const loadDefaultWarehouse = async () => {
+  return;
   try {
     const response = await axios.post(
       `${VUE_APP_API_URL}users/get-default-warehouse`,

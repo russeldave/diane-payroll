@@ -623,9 +623,8 @@ const getUserWarehouses = async () => {
   try {
     warehouses.value = [];
     const response = await axios.post(
-      `${VUE_APP_API_URL}users/warehouses-dropdown`,
-      { id: 0 }, // Assuming you want to fetch all warehouses
-      BearToken(token)
+      `api/users/warehouses-dropdown`,
+      { id: 0 }
     );
     warehouses.value = response.data.userWarehouses || [];
     assignForm.value.warehouse_id = response.data.userAssignedWarehouseId

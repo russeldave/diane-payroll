@@ -199,12 +199,15 @@ const login = async () => {
       username: form.value.username,
       password: form.value.password
     });
+    // console.log('test login')
+    // console.log(response.data)
 
     if (response.data?.user) {
       const userInfo = response.data.user;
-      localStorage.setItem("user", userInfo);
+      localStorage.setItem("user", JSON.stringify(userInfo));
       // Save session
       sessionStore.setSession(userInfo);
+      preProcess();
 
       Swal.fire({
         title: "Loading Preloaded Data...",
@@ -216,7 +219,7 @@ const login = async () => {
       setTimeout(() => {
         Swal.close();
         window.location.replace(
-          userInfo.defaultUri || "/request-ingredient"
+          "/dashboard2"
         );
       }, 1000);
 
@@ -244,9 +247,9 @@ const login = async () => {
 
 // Preprocess necessary data after successful login
 const preProcess = async (token) => {
-  await getPermissions(token);
-  await getRoles(token);
-  await getUnits(token);
+  await getPermissions();
+  // await getRoles(token);
+  // await getUnits(token);
 };
 </script>
 

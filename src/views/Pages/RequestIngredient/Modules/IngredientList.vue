@@ -188,7 +188,7 @@ const getIngredientsByCategory = async () => {
     data.value = [];
     const formData = FormDx(search.value);
     const response = await axios.post(
-      `${VUE_APP_API_URL}ingredients/list-in-shopping`,
+      `api/ingredients/list-in-shopping`,
       formData,
       BearToken(token)
     );
@@ -222,7 +222,7 @@ const handleTransaction = (transaction_id) => {
 const getCategories = async () => {
   try {
     const response = await axios.get(
-      `${VUE_APP_API_URL}ingredient-categories/dropdown`,
+      `api/ingredient-categories/dropdown`,
       BearToken(token)
     );
     categories.value = response.data;

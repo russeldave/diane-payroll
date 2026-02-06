@@ -50,9 +50,9 @@
           <div
             class="flex items-center p-0 text-white font-bold ml-0 text-xs md:text-sm text-nowrap"
           >
-            <RouterLink to="/system-information" class="flex items-start space-x-0">
+            <!-- <RouterLink to="/system-information" class="flex items-start space-x-0">
               <CompanyLogo />
-            </RouterLink>
+            </RouterLink> -->
           </div>
         </div>
         <div class="flex items-center">
@@ -76,7 +76,7 @@
               <!-- <StoreDropdown /> -->
               <WarehouseDropdown @warehouseChanged="onWarehouseChange" />
               <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
-                <UserQr />
+                <!-- <UserQr /> -->
               </div>
               <!-- <ZoomControls /> -->
               <button
@@ -96,7 +96,7 @@
                 <i class="fa fa-power-off"></i>
               </button>
               <div class="border-l-2 border-l-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
-                <DirectoryButton />
+                <!-- <DirectoryButton /> -->
               </div>
             </div>
           </div>
@@ -141,11 +141,11 @@
             </RouterLink>
             <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
             <!-- <i class="fa-solid fa-qrcode text-3xl"></i> -->
-             <UserBarcode />
+             <!-- <UserBarcode /> -->
           </div>
             <div class="size-10 flex items-center justify-center rounded border border-lime-500 bg-gray-200">
            
-              <UserQr />
+              <!-- <UserQr /> -->
             </div>
           </div>
         </div>
@@ -401,8 +401,8 @@ const reloadDefault = async () => {
     // Reload all default data
     // await getDefaultWarehouse(token);
     await getPermissions();
-    await getRoles(token);
-    await getUnits(token);
+    // await getRoles(token);
+    // await getUnits(token);
 
     // Close the loading Swal2 and show success alert
     Swal.close();

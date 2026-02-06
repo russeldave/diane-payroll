@@ -944,9 +944,8 @@ const getWarehouses = async () => {
   try {
     warehouses.value = [];
     const response = await axios.post(
-      `${VUE_APP_API_URL}users/warehouses-dropdown`,
-      { id: 0 },
-      BearToken(token)
+      `api/users/warehouses-dropdown`,
+      { id: 0 }
     );
     warehouses.value = response.data.userWarehouses || [];
   } catch (error) {

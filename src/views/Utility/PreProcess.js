@@ -6,10 +6,8 @@ import { FormDx, BearToken } from "./Helper";
 // require token
 export const getPermissions = async () => {
   try {
-    const formData = FormDx({ id: 0 });
     const response = await axios.post(
-      `api/users/get-user-permissions`,
-      formData
+      `api/users/get-user-permissions`
     );
     if (response) {
       const encryptedData = encryptData(response.data.permissions);
