@@ -83,11 +83,11 @@
               <!-- <ZoomControls /> -->
               <button
                 type="button"
-                @click.prevent="reloadDefault()"
+                @click.prevent="reloadDefault"
                 title="Reload Pre-process data"
                 class="flex font-bold items-center text-xl p-2 text-red-500 rounded-l text-white rounded bg-purple-500 group"
               >
-                <i class="fa fa-sync"></i>
+                <i class="fa fa-sync"></i> test
               </button>
               <button
                 type="button"
@@ -255,18 +255,18 @@ import Swal from "sweetalert2";
 import { RouterLink } from "vue-router";
 import { useSessionStore } from "@/stores/sessionStore";
 import { hasPermission } from "../Utility/Permissions";
-import { IS_DEV, VUE_APP_API_URL, DEFAULT_BG } from "@/views/Utility/Global";
-import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
+// import { IS_DEV, VUE_APP_API_URL, DEFAULT_BG } from "@/views/Utility/Global";
+import { getPermissions } from "../Utility/PreProcess";
 import { BearToken, FormDx, handleApiError } from "../Utility/Helper";
 import { navigationConfig } from "../Utility/NavigationConfig";
 
-import ZoomControls from "@/views/Component/ZoomControls.vue";
-import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
-import CompanyLogo from "@/views/Component/CompanyLogo.vue";
-import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
-import StoreDropdown from "@/views/Component/StoreDropdown.vue";
-import UserQr from "@/views/Component/modals/UserQr.vue";
-import UserBarcode from "@/views/Component/modals/UserBarcode.vue";
+// import ZoomControls from "@/views/Component/ZoomControls.vue";
+// import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
+// import CompanyLogo from "@/views/Component/CompanyLogo.vue";
+// import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
+// import StoreDropdown from "@/views/Component/StoreDropdown.vue";
+// import UserQr from "@/views/Component/modals/UserQr.vue";
+// import UserBarcode from "@/views/Component/modals/UserBarcode.vue";
 
 import profilePicture from "@/assets/images/profile/profile.png";
 // Define the emits for this component
@@ -391,7 +391,7 @@ const startClock = () => {
 
 // Preprocess necessary data after successful login
 const reloadDefault = async () => {
-  // Show processing Swal2
+  console.log("relaodDefault"); // Show processing Swal2
   Swal.fire({
     title: "Processing...",
     text: "Please wait while the data is being reloaded.",

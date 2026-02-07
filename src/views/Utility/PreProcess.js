@@ -1,17 +1,15 @@
-import axios from "axios";
-import { encryptData } from "./AES";
-import { VUE_APP_API_URL } from "./Global";
-import { FormDx, BearToken } from "./Helper";
+import { FormDx } from "./Helper";
 
 // require token
 export const getPermissions = async () => {
+  console.log('getpermmissions')
   try {
     const response = await axios.post(
       `api/users/get-user-permissions`
     );
     if (response) {
-      const encryptedData = encryptData(response.data.permissions);
-      localStorage.setItem("pe-001", encryptedData);
+      const encryptedData = response.data.permissions;
+      localStorage.setItem("pe-001", JSON.stringify(encryptedData));
     }
   } catch (error) {
     console.error("Error fetching permissions:", error);
@@ -26,8 +24,8 @@ export const getRoles = async () => {
       formData
     );
     if (response) {
-      const encryptedData = encryptData(response.data.roles);
-      localStorage.setItem("ro-001", encryptedData);
+      const encryptedData = response.data.roles;
+      localStorage.setItem("ro-001", JSON.stringify(encryptedData));
     }
   } catch (error) {
     // Handle the error (log, throw, etc.)
@@ -43,8 +41,8 @@ export const getUnits = async (token = "") => {
       formData
     );
     if (response) {
-      const encryptedData = encryptData(response.data.units);
-      localStorage.setItem("un-001", encryptedData);
+      const encryptedData = response.data.units;
+      localStorage.setItem("un-001", JSON.stringify(encryptedData));
     }
   } catch (error) {
     // Handle the error (log, throw, etc.)

@@ -81,8 +81,8 @@ import { onMounted, ref } from "vue";
 import Swal from "sweetalert2";
 import axios from "axios";
 import Modal from "@/views/Component/Modal.vue";
-import Paginator from "@/views/Component/Pagination.vue";
-import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
+// import Paginator from "@/views/Component/Pagination.vue";
+// import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
 import { VUE_APP_API_URL, PERMISSION, ROLE } from "@/views/Utility/Global";
 import {
   FormDx,
@@ -100,7 +100,7 @@ const form = ref({
   name: "",
   email: "",
   password: "",
-  role: "",
+  role_id: 1,
   zoho_user_id: "",
 });
 const resetForm = () => {
@@ -111,7 +111,7 @@ const resetForm = () => {
 };
 const register = async () => {
   try {
-    // Show processing state
+    // Show processing st ate
     Swal.fire({
       title: "Processing...",
       text: "Please wait while we create the user account.",
@@ -124,7 +124,7 @@ const register = async () => {
 
     const formData = FormDx(form.value);
     const response = await axios.post(
-      `${VUE_APP_API_URL}register`,
+      `${VUE_APP_API_URL}/users/register`,
       formData,
       BearToken(token)
     );
@@ -144,6 +144,7 @@ const register = async () => {
   } catch (error) {
     // Close processing alert on error
     Swal.close();
+    console.log("REGISTER ERROR:", error.response);
     handleApiError(error);
   }
 };

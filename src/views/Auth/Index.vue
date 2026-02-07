@@ -160,9 +160,7 @@ import axios from "axios";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
-import { VUE_APP_API_URL, IS_DEV, DEFAULT_BG } from "@/views/Utility/Global";
 import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
-import { FormDx } from "../Utility/Helper";
 
 const sessionStore = useSessionStore();
 const router = useRouter();
@@ -192,19 +190,19 @@ const login = async () => {
 
     errors.value = {};
 
-    await axios.get('/sanctum/csrf-cookie');
+    await axios.get("/sanctum/csrf-cookie");
 
-   // Step 2: Login
-    const response = await axios.post('login', {
+    // Step 2: Login
+    const response = await axios.post("login", {
       username: form.value.username,
-      password: form.value.password
+      password: form.value.password,
     });
     // console.log('test login')
     // console.log(response.data)
 
     if (response.data?.user) {
       const userInfo = response.data.user;
-      localStorage.setItem("user", JSON.stringify(userInfo));
+      localStorage.setItem("user", JSON.stringify(user));
       // Save session
       sessionStore.setSession(userInfo);
       preProcess();
@@ -218,15 +216,11 @@ const login = async () => {
 
       setTimeout(() => {
         Swal.close();
-        window.location.replace(
-          "/dashboard2"
-        );
+        window.location.replace("/dashboard2");
       }, 1000);
-
     } else {
       throw new Error("Invalid login response");
     }
-
   } catch (error) {
     console.error("Login error:", error);
     Swal.close();
@@ -234,8 +228,7 @@ const login = async () => {
     if (error.response?.data?.errors) {
       errors.value = error.response.data.errors;
     } else {
-      errors.value.message =
-        error.response?.data?.message || "Invalid credentials";
+      errors.value.message = error.response?.data?.message || "Invalid credentials";
     }
 
     setTimeout(() => {
@@ -243,7 +236,6 @@ const login = async () => {
     }, 3000);
   }
 };
-
 
 // Preprocess necessary data after successful login
 const preProcess = async (token) => {

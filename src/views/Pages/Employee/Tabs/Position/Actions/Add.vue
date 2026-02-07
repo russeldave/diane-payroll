@@ -5,43 +5,44 @@
   >
     <i class="fa fa-network-wired"></i> Add Position
   </button>
-  <Modal :show="isAddModalOpen" :maxWidth="'xl'" title="Add New Position" @close="isAddModalOpen = false">
+  <Modal
+    :show="isAddModalOpen"
+    :maxWidth="'xl'"
+    title="Add New Position"
+    @close="isAddModalOpen = false"
+  >
     <div class="grid grid-cols-1 gap-2 p-4">
       <form class="mt-4" @submit.prevent="addPosition()" autocomplete="off">
-          <div class="mb-4">
-            <label
-              for="LeagueName"
-              class="block text-sm font-medium text-gray-700"
-              >Name</label
-            >
-            <input
-              type="text"
-              v-model="form.position_name"
-              required
-              placeholder="Input Position Name"
-              class="mt-1 p-2 border rounded-md w-full"
-            />
-          </div>
-          <div class="mb-4">
-            <label
-              for="LeagueName"
-              class="block text-sm font-medium text-gray-700"
-              >Remarks</label
-            >
-            <!-- <textarea
+        <div class="mb-4">
+          <label for="LeagueName" class="block text-sm font-medium text-gray-700"
+            >Name</label
+          >
+          <input
+            type="text"
+            v-model="form.position_name"
+            required
+            placeholder="Input Position Name"
+            class="mt-1 p-2 border rounded-md w-full"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="LeagueName" class="block text-sm font-medium text-gray-700"
+            >Remarks</label
+          >
+          <!-- <textarea
               placeholder="Input Remarks"
               v-model="form.remarks"
               required
               class="mt-1 p-2 border rounded-md w-full"
             >
             </textarea> -->
-            <textarea
-              placeholder="Input Remarks"
-              v-model="form.remarks"
-              class="mt-1 p-2 border rounded-md w-full"
-            >
-            </textarea>
-          </div>
+          <textarea
+            placeholder="Input Remarks"
+            v-model="form.remarks"
+            class="mt-1 p-2 border rounded-md w-full"
+          >
+          </textarea>
+        </div>
         <div class="block float-end">
           <button
             type="submit"
@@ -66,8 +67,8 @@ const emits = defineEmits(["transaction_id"]);
 const token = localStorage.getItem("token");
 const isAddModalOpen = ref(false); // Control visibility of add product modal
 const form = ref({
-  position_name: '',
-  remarks: '',
+  position_name: "",
+  remarks: "",
 });
 const addPositionBehavior = async () => {
   isAddModalOpen.value = true;
@@ -75,27 +76,23 @@ const addPositionBehavior = async () => {
 };
 const resetForm = () => {
   form.value = {
-    position_name: '',
-    remarks: '',
+    position_name: "",
+    remarks: "",
   };
-}
+};
 const addPosition = async () => {
   try {
     // Show the processing alert
     Swal.fire({
-      title: 'Processing...',
+      title: "Processing...",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
-      }
+      },
     });
 
     const formData = FormDx(form.value);
-    const response = await axios.post(
-      VUE_APP_API_URL + "employee-positions/add",
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post("api/employee-positions/add", formData);
     if (response.data) {
       Swal.close();
       isAddModalOpen.value = false;
@@ -116,5 +113,4 @@ const handlePhotoUpload = (event) => {
   // Assuming form.value.employee_images is an array to store multiple files
   form.value.employee_images = fileArray; // Assign the array of selected files to form object
 };
-
 </script>

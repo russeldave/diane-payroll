@@ -1,5 +1,5 @@
 <template>
-  <div v-if="hasPermission('Navigation_Users') && hasPermission('Navigation_Settings')">
+  <div>
     <div class="px-4 min-h-screen rounded-lg dark:border-gray-700 bg-white">
       <!-- Add Product Button -->
       <BreadCrumbs :page="'User Management'" />
@@ -12,16 +12,13 @@
           @input.prevent="searchInput()"
           class="shadow shadow-gray-700 flex w-full md:w-1/4 focus-visible:bg-yellow-100 font-bold text-sm md:text-md py-2 px-4 rounded mb-4 float-end"
         />
-        <Add
-          v-if="hasPermission('Add_User_Button')"
-          @transaction_id="handleTransaction()"
-        />
+        <Add @transaction_id="handleTransaction()" />
       </div>
       <div class="flex w-full overflow-auto px-2">
         <!-- Table to display products -->
         <table class="min-w-full divide-y divide-gray-200">
           <!-- Table headers -->
-          <thead class="text-white shadow" :class="DEFAULT_BG">
+          <thead class="text-white shadow bg-gray-800">
             <tr class="border-b-2 border-solid border-yellow-500">
               <th
                 scope="col"
@@ -69,11 +66,7 @@
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <!-- Loop through products and display them -->
-            <tr
-              v-for="user in data.users"
-              v-if="data.users?.length > 0 && loading == false"
-              :key="user.id"
-            >
+            <tr v-for="user in data.users" :key="user.id">
               <td class="px-2 py-2 border">{{ user.name }}</td>
               <td class="px-2 py-2 border">{{ user.email }}</td>
               <td class="px-2 py-2 border">{{ user.zohoUserId ?? "-" }}</td>
@@ -97,11 +90,11 @@
                     :data="user"
                     @transaction_id="handleTransaction()"
                   />
-                  <!-- <AssignStore
+                  <AssignStore
                     v-if="hasPermission('Assign_Store_Button')"
                     :data="user"
                     @transaction_id="handleTransaction()"
-                  /> -->
+                  />
                   <AssignWarehouse
                     v-if="hasPermission('Assign_Warehouse_Button')"
                     :data="user"
@@ -139,19 +132,14 @@
       </div>
     </div>
   </div>
-  <div v-else>
-    <Error403 />
-  </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
 import axios from "axios";
-import Modal from "@/views/Component/Modal.vue";
 import Paginator from "@/views/Component/Pagination.vue";
 import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
-import { VUE_APP_API_URL, DEFAULT_BG } from "@/views/Utility/Global";
-import { FormDx, BearToken, Alert, handleApiError,useDebounce } from "@/views/Utility/Helper";
+import { FormDx, handleApiError, useDebounce } from "@/views/Utility/Helper";
 import { hasPermission } from "@/views/Utility/Permissions";
 import Error403 from "@/views/Error/403.vue";
 import Loader from "@/views/Component/Loader.vue";
@@ -160,13 +148,12 @@ import Add from "./Actions/Add.vue";
 import Edit from "./Actions/Edit.vue";
 import Role from "./Actions/Role.vue";
 import ResetPassword from "./Actions/ResetPassword.vue";
-import AssignStore from "./Actions/AssignStore.vue";
-import AssignWarehouse from "./Actions/AssignWarehouse.vue";
+// import AssignWarehouse from "./Actions/AssignWarehouse.vue";
 import BindEmployee from "./Actions/BindEmployee.vue";
 
-const token = localStorage.getItem("token");
 const data = ref([]); // Array to hold products
 const loading = ref(false);
+const permissionsLoaded = ref(false);
 const search = ref({
   search: "",
   page_num: 1,
@@ -176,11 +163,7 @@ const listUsers = async () => {
   try {
     loading.value = true;
     const formData = FormDx(search.value);
-    const response = await axios.post(
-      `${VUE_APP_API_URL}users/list`,
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post(`api/users/list`, formData);
     data.value = response.data;
     loading.value = false;
   } catch (error) {
@@ -195,14 +178,28 @@ const handleTransaction = (transaction_id) => {
   listUsers();
 };
 
-const searchInput =  useDebounce(async () => {
+const searchInput = useDebounce(async () => {
   search.value.page_num = 1;
   await listUsers();
   handlePagination(1);
-},500);
-
+}, 500);
+const getPermissions = async () => {
+  console.log("getpermmissions");
+  try {
+    const response = await axios.post(`api/users/get-user-permissions`);
+    if (response) {
+      const encryptedData = response.data.permissions;
+      localStorage.setItem("pe-001", JSON.stringify(response.data.permissions));
+      permissionsLoaded.value = true;
+    }
+  } catch (error) {
+    console.error("Error fetching permissions:", error);
+    return []; // You may want to handle errors more gracefully based on your use case
+  }
+};
 // Call listUsers when component is mounted
 onMounted(() => {
   listUsers();
+  getPermissions();
 });
 </script>
