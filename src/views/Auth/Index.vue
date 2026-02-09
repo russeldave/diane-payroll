@@ -202,7 +202,7 @@ const login = async () => {
 
     if (response.data?.user) {
       const userInfo = response.data.user;
-      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(userInfo));
       // Save session
       sessionStore.setSession(userInfo);
       preProcess();

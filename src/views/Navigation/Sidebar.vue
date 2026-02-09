@@ -83,11 +83,11 @@
               <!-- <ZoomControls /> -->
               <button
                 type="button"
-                @click.prevent="reloadDefault"
+                @click.prevent="reloadDefault()"
                 title="Reload Pre-process data"
                 class="flex font-bold items-center text-xl p-2 text-red-500 rounded-l text-white rounded bg-purple-500 group"
               >
-                <i class="fa fa-sync"></i> test
+                <i class="fa fa-sync"></i>
               </button>
               <button
                 type="button"
@@ -259,6 +259,7 @@ import { hasPermission } from "../Utility/Permissions";
 import { getPermissions } from "../Utility/PreProcess";
 import { BearToken, FormDx, handleApiError } from "../Utility/Helper";
 import { navigationConfig } from "../Utility/NavigationConfig";
+import { useRouter } from "vue-router";
 
 // import ZoomControls from "@/views/Component/ZoomControls.vue";
 // import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
@@ -271,8 +272,8 @@ import { navigationConfig } from "../Utility/NavigationConfig";
 import profilePicture from "@/assets/images/profile/profile.png";
 // Define the emits for this component
 const emits = defineEmits(["openDrawer", "warehouseChanged"]);
-
-const user = localStorage.getItem("user");
+const router = useRouter();
+const user = computed(() => sessionStore.user);
 const token = localStorage.getItem("token");
 const outOfStockCount = ref(13);
 const sessionStore = useSessionStore();
@@ -312,58 +313,38 @@ const toggleDropdown = (dropdown) => {
 
 const logOut = async () => {
   try {
-    // Show processing Swal
+    // Show loading dialog
     Swal.fire({
       title: "Logging out...",
       text: "Please wait a moment",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      didOpen: () => Swal.showLoading(),
     });
 
-    const response = await axios.post("logout");
+    // ✅ SESSION / COOKIE LOGOUT
+    await axios.post("/logout"); // -> /api/logout
 
-    if (response) {
-      // Preserve theme in localStorage
-      const theme = localStorage.getItem("theme");
+    // ✅ PRESERVE THEME
+    const theme = localStorage.getItem("theme");
 
-      // Clear everything in localStorage except for the theme
-      localStorage.clear();
-      if (theme) {
-        localStorage.setItem("theme", theme); // Restore theme setting
-      }
+    // ✅ CLEAR FRONTEND STATE
+    sessionStore.clearUser();
+    localStorage.clear();
+    sessionStorage.clear();
 
-      // Clear session storage
-      sessionStore.clearUser();
-
-      // Close the Swal and reload
-      Swal.close();
-      window.location.replace("/login");
-      location.reload();
+    if (theme) {
+      localStorage.setItem("theme", theme);
     }
+
+    Swal.close();
+
+    // ✅ REDIRECT TO LOGIN (NO PAGE RELOAD)
+    router.replace({ name: "login" });
   } catch (error) {
+    Swal.close();
     console.error("Error logging out:", error);
     Swal.fire("Error", "Failed to log out. Please try again.", "error");
-  } finally {
-    // Close the Swal if it is still open
-    if (Swal.isVisible()) {
-      const theme = localStorage.getItem("theme");
-
-      // Clear everything in localStorage except for the theme
-      localStorage.clear();
-      if (theme) {
-        localStorage.setItem("theme", theme); // Restore theme setting
-      }
-
-      // Clear session storage
-      sessionStorage.clear();
-
-      // Close the Swal and reload
-      Swal.close();
-      location.reload();
-    }
   }
 };
 

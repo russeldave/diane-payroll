@@ -53,7 +53,7 @@ export const handleApiError = (error) => {
     if (error.response && error.response.status === 401) {
       Toast('error', 'Invalid Token!', 'Token unauthenticated! Please try logout if error persists.');
       // Optionally, you can redirect the user to the login page or perform other actions
-      // handleLogout();
+      // handleLogout()
     }
     // Handle request timeouts (ECONNABORTED)
     else if (error.code === 'ECONNABORTED') {

@@ -1,7 +1,11 @@
 <template>
   <div
     class="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 opacity-80"
-    :class="IS_DEV ? 'bg-red-500' : 'bg-gradient-to-l from-black via-red-600 via-red-700 via-red-500 via-red-700 to-[#800000]'"
+    :class="
+      IS_DEV
+        ? 'bg-red-500'
+        : 'bg-gradient-to-l from-black via-red-600 via-red-700 via-red-500 via-red-700 to-[#800000]'
+    "
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <h2
@@ -18,7 +22,7 @@
       >
         <div>
           <label for="email" class="block text-xl font-medium leading-6 text-gray-200"
-            >Nmae</label
+            >Name</label
           >
           <div class="mt-2">
             <input

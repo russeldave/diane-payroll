@@ -1,4 +1,5 @@
 import { ref, watch } from 'vue';
+import { decryptData } from "./AES";
 
 // Base URL
 // http://10.20.0.106:8092/api - server api url
@@ -40,55 +41,54 @@ export const DATE_NOW = () => {
 };
 export const BUILDING = async () => {
     const data = localStorage.getItem('bu-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
-
 export const ROLE = async () => {
     const data = localStorage.getItem('ro-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const PERMISSION = () => {
     const data = localStorage.getItem('pe-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const CATEGORIES = async () => {
     const data = localStorage.getItem('ca-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const COMPANIES = async () => {
     const data = localStorage.getItem('co-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const WAREHOUSE = async () => {
     const data = localStorage.getItem('wh-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const RACK = async () => {
     const data = localStorage.getItem('ra-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const BINS = async () => {
     const data = localStorage.getItem('bin-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 export const UNITS = async () => {
     const data = localStorage.getItem('un-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 
 //tanginang life to deeeemn!!
 export const USER = async () => {
     const data = localStorage.getItem('us-001') ?? '000000';
-    const decryptedData = data;
+    const decryptedData = decryptData(data);
     return decryptedData;
 };
 
