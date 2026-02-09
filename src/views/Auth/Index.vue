@@ -1,11 +1,6 @@
 <template>
   <div
-    class="flex min-h-screen flex-col justify-center p-0 opacity-80"
-    :class="
-      IS_DEV
-        ? 'bg-red-500'
-        : 'bg-gradient-to-l from-[#4B0082] via-blue-600 via-blue-700 via-blue-500 via-blue-700 to-[#4B0082]'
-    "
+    class="flex min-h-screen flex-col justify-center p-0 opacity-80 bg-gradient-to-l from-[#4B0082] via-blue-600 via-blue-700 via-blue-500 via-blue-700 to-[#4B0082]"
   >
     <div class="sm:mx-auto sm:w-full justify-center flex sm:max-w-sm">
       <RouterLink
@@ -136,9 +131,9 @@
         </div>
 
         <!-- Error Message -->
-        <small v-if="errors.message" class="text-red-500 mt-2 block text-center">
+        <!-- <small v-if="errors.message" class="text-red-500 mt-2 block text-center">
           {{ errors.message }}
-        </small>
+        </small> -->
 
         <!-- Submit Button -->
         <div>
@@ -155,30 +150,29 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import axios from "axios";
 import { useSessionStore } from "@/stores/sessionStore";
 import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
-import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
+import { getPermissions } from "../Utility/PreProcess";
 
 const sessionStore = useSessionStore();
 const router = useRouter();
 
-const errors = ref(false);
-const message = ref(false);
+const errors = ref({}); // ✅ object, not boolean
+const message = ref(""); // optional
 const showPassword = ref(false);
 const form = ref({
   username: "",
   password: "",
 });
 
-// Function to toggle password visibility
+// Toggle password visibility
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
 };
 
-// Login function
 const login = async () => {
   try {
     Swal.fire({
@@ -188,56 +182,24 @@ const login = async () => {
       allowOutsideClick: false,
     });
 
-    errors.value = {};
-
-    await axios.get("/sanctum/csrf-cookie");
-
-    // Step 2: Login
-    const response = await axios.post("login", {
+    await sessionStore.login({
       username: form.value.username,
       password: form.value.password,
     });
-    // console.log('test login')
-    // console.log(response.data)
 
-    if (response.data?.user) {
-      const userInfo = response.data.user;
-      localStorage.setItem("user", JSON.stringify(userInfo));
-      // Save session
-      sessionStore.setSession(userInfo);
-      preProcess();
+    await nextTick(); // ✅ ensure reactivity has updated
 
-      Swal.fire({
-        title: "Loading Preloaded Data...",
-        text: "Please wait while we prepare your account.",
-        didOpen: () => Swal.showLoading(),
-        allowOutsideClick: false,
-      });
+    Swal.close();
+    router.push("/users");
 
-      setTimeout(() => {
-        Swal.close();
-        window.location.replace("/dashboard2");
-      }, 1000);
-    } else {
-      throw new Error("Invalid login response");
-    }
+    window.location.reload();
   } catch (error) {
     console.error("Login error:", error);
     Swal.close();
-
-    if (error.response?.data?.errors) {
-      errors.value = error.response.data.errors;
-    } else {
-      errors.value.message = error.response?.data?.message || "Invalid credentials";
-    }
-
-    setTimeout(() => {
-      errors.value = {};
-    }, 3000);
   }
 };
 
-// Preprocess necessary data after successful login
+// Preload permissions or other data after login
 const preProcess = async (token) => {
   await getPermissions();
   // await getRoles(token);

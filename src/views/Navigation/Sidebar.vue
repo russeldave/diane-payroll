@@ -83,11 +83,11 @@
               <!-- <ZoomControls /> -->
               <button
                 type="button"
-                @click.prevent="reloadDefault()"
+                @click.prevent="reloadDefault"
                 title="Reload Pre-process data"
                 class="flex font-bold items-center text-xl p-2 text-red-500 rounded-l text-white rounded bg-purple-500 group"
               >
-                <i class="fa fa-sync"></i>
+                <i class="fa fa-sync"></i> test
               </button>
               <button
                 type="button"
@@ -128,9 +128,13 @@
           class="w-12 h-12 rounded-full border-2 border-slate-500"
         />
         <div class="ms-4">
-          <p class="text-lg font-bold text-white uppercase">{{ user.name }}</p>
+          <p class="text-lg font-bold text-white uppercase">
+            {{ user?.name || "User name not saved" }}
+          </p>
           <!-- <p class="text-sm text-gray-300 text-white">{{ user.roleName }}</p> -->
-          <p class="text-xs text-gray-300 text-white">{{ user.email }}</p>
+          <p class="text-xs text-gray-300 text-white">
+            {{ user?.email || "User email not saved" }}
+          </p>
           <div class="flex flex-row gap-2">
             <RouterLink to="/profile">
               <button
@@ -259,7 +263,6 @@ import { hasPermission } from "../Utility/Permissions";
 import { getPermissions } from "../Utility/PreProcess";
 import { BearToken, FormDx, handleApiError } from "../Utility/Helper";
 import { navigationConfig } from "../Utility/NavigationConfig";
-import { useRouter } from "vue-router";
 
 // import ZoomControls from "@/views/Component/ZoomControls.vue";
 // import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
@@ -272,8 +275,8 @@ import { useRouter } from "vue-router";
 import profilePicture from "@/assets/images/profile/profile.png";
 // Define the emits for this component
 const emits = defineEmits(["openDrawer", "warehouseChanged"]);
-const router = useRouter();
-const user = computed(() => sessionStore.user);
+
+const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
 const outOfStockCount = ref(13);
 const sessionStore = useSessionStore();
@@ -313,38 +316,58 @@ const toggleDropdown = (dropdown) => {
 
 const logOut = async () => {
   try {
-    // Show loading dialog
+    // Show processing Swal
     Swal.fire({
       title: "Logging out...",
       text: "Please wait a moment",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      didOpen: () => Swal.showLoading(),
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
 
-    // ✅ SESSION / COOKIE LOGOUT
-    await axios.post("/logout"); // -> /api/logout
+    const response = await axios.post("logout");
 
-    // ✅ PRESERVE THEME
-    const theme = localStorage.getItem("theme");
+    if (response) {
+      // Preserve theme in localStorage
+      const theme = localStorage.getItem("theme");
 
-    // ✅ CLEAR FRONTEND STATE
-    sessionStore.clearUser();
-    localStorage.clear();
-    sessionStorage.clear();
+      // Clear everything in localStorage except for the theme
+      localStorage.clear();
+      if (theme) {
+        localStorage.setItem("theme", theme); // Restore theme setting
+      }
 
-    if (theme) {
-      localStorage.setItem("theme", theme);
+      // Clear session storage
+      sessionStore.clearUser();
+
+      // Close the Swal and reload
+      Swal.close();
+      window.location.replace("/login");
+      location.reload();
     }
-
-    Swal.close();
-
-    // ✅ REDIRECT TO LOGIN (NO PAGE RELOAD)
-    router.replace({ name: "login" });
   } catch (error) {
-    Swal.close();
     console.error("Error logging out:", error);
     Swal.fire("Error", "Failed to log out. Please try again.", "error");
+  } finally {
+    // Close the Swal if it is still open
+    if (Swal.isVisible()) {
+      const theme = localStorage.getItem("theme");
+
+      // Clear everything in localStorage except for the theme
+      localStorage.clear();
+      if (theme) {
+        localStorage.setItem("theme", theme); // Restore theme setting
+      }
+
+      // Clear session storage
+      sessionStorage.clear();
+
+      // Close the Swal and reload
+      Swal.close();
+      location.reload();
+    }
   }
 };
 

@@ -11,10 +11,10 @@ export const navigationConfig = {
       isLink: true,
     },
     {
-      id: "dashboard2",
-      title: "Dashboard2",
+      id: "dashboard",
+      title: "Dashboard",
       icon: "fa-cash-register",
-      route: "/dashboard2",
+      route: "/dashboard",
       isLink: true,
     },
         {

@@ -109,11 +109,7 @@ const resetPassword = async () => {
     });
 
     const formData = FormDx(resetForm.value);
-    const response = await axios.post(
-      `${VUE_APP_API_URL}users/change-password`,
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post(`api/users/change-password`, formData);
 
     // Close processing alert
     Swal.close();

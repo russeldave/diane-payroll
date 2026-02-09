@@ -37,10 +37,10 @@
           </div>
           <div class="border-r-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
             <p class="text-sm text-gray-200 font-bold text-white uppercase">
-              {{ user.name }}
+              {{ user?.name || "Not save name" }}
             </p>
             <p class="text-xs text-yellow-600 text-nowrap first-letter:uppercase">
-              {{ user.roleName }}
+              {{ user?.roleName || "note save roleName" }}
             </p>
           </div>
           <RouterLink
@@ -304,7 +304,7 @@ import { useSessionStore } from "@/stores/sessionStore";
 import { hasPermission } from "../Utility/Permissions";
 // import { IS_DEV, VUE_APP_API_URL, DEFAULT_BG } from "@/views/Utility/Global";
 // import { BearToken, FormDx, handleApiError, Alert } from "../Utility/Helper";
-// import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
+import { getPermissions, getRoles, getUnits } from "../Utility/PreProcess";
 import { navigationConfig } from "../Utility/NavigationConfig";
 
 import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
@@ -312,17 +312,13 @@ import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
 // import DirectoryButton from "@/views/Pages/Directory/DirectoryButton.vue";
 // import UserQr from "@/views/Component/modals/UserQr.vue";
 // import UserBarcode from "@/views/Component/modals/UserBarcode.vue";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
 
 const emits = defineEmits(["openDrawer", "warehouseChanged"]);
 const route = useRoute();
 const currentPath = computed(() => route.path);
-const user = JSON.parse(localStorage.getItem("user"));
+const user = ref(null);
 const lastScrollY = ref(0);
 const hideNav = ref(localStorage.getItem("primaryNavHidden") === "true" || false);
-const token = localStorage.getItem("token");
 const hasShownAlert = ref(false);
 const sessionStore = useSessionStore();
 const isDrawerOpen = ref(true);
@@ -426,25 +422,37 @@ const logOut = async () => {
       text: "Please wait a moment",
       allowOutsideClick: false,
       allowEscapeKey: false,
-      didOpen: () => Swal.showLoading(),
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
 
-    await axios.post("/logout");
-
-    const theme = localStorage.getItem("theme");
-
-    sessionStore.clearUser(); // ✅ this makes user = null
-    localStorage.clear();
-    sessionStorage.clear();
-
-    if (theme) localStorage.setItem("theme", theme);
-
-    Swal.close();
-    router.replace({ name: "login" }); // ✅ no reload
+    await sessionStore.logout();
+    // window.location.reload();
+    if (response) {
+      const theme = localStorage.getItem("theme");
+      localStorage.clear();
+      if (theme) {
+        localStorage.setItem("theme", theme);
+      }
+      sessionStorage.clear();
+      Swal.close();
+      location.reload();
+    }
   } catch (error) {
-    Swal.close();
     console.error("Error logging out:", error);
     Swal.fire("Error", "Failed to log out. Please try again.", "error");
+  } finally {
+    if (Swal.isVisible()) {
+      const theme = localStorage.getItem("theme");
+      localStorage.clear();
+      if (theme) {
+        localStorage.setItem("theme", theme);
+      }
+      sessionStorage.clear();
+      Swal.close();
+      location.reload();
+    }
   }
 };
 
@@ -572,6 +580,12 @@ const checkPrimaryHidden = () => {
 };
 
 onMounted(() => {
+  // 1. Ensure we have the latest data from the server
+  // 2. Assign the state value to your local ref
+  user.value = sessionStore.user.user;
+  console.log("topNav ");
+  console.log(user.value.name);
+
   window.addEventListener("scroll", handleScroll);
   window.addEventListener("click", handleClickOutside);
   startClock();
