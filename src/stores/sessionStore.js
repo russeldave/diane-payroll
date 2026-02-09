@@ -1,40 +1,37 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import axios from 'axios';
+// src/stores/sessionStore.js
+import { defineStore } from 'pinia'
+import axios from 'axios'
 
-export const useSessionStore = defineStore('session', () => {
-  const user = ref(null);
-  const loading = ref(false);
-
-  const isAuthenticated = computed(() => !!user.value);
-
-  const setSession = (userInfo) => {
-    user.value = userInfo;
-  };
-
-  const clearUser = () => {
-    user.value = null;
-  };
-
-  // 🔥 This is the KEY for new tabs
-  const fetchSession = async () => {
-    try {
-      loading.value = true;
-      const res = await axios.get('/api/me');
-      user.value = res.data.user;
-    } catch (e) {
-      user.value = null;
-    } finally {
-      loading.value = false;
+export const useSessionStore = defineStore('session', {
+  state: () => ({
+    user: null,
+    loading: false
+  }),
+  getters: {
+    authenticated: (state) => !!state.user,
+  },
+  actions: {
+    async login(form) {
+      // 1. Mandatory CSRF initialization for Sanctum
+      await axios.get('/sanctum/csrf-cookie');
+      
+      // 2. Perform login
+      await axios.post('/login', form);
+      
+      // 3. Fetch user data to verify session and update state
+      return this.getUser();
+    },
+    async logout() {
+      await axios.post('/logout');
+      this.user = null;
+    },
+    async getUser() {
+      try {
+        const res = await axios.get('/api/me');
+        this.user = res.data;
+      } catch {
+        this.user = null;
+      }
     }
-  };
-
-  return {
-    user,
-    loading,
-    isAuthenticated,
-    setSession,
-    clearUser,
-    fetchSession
-  };
-});
+  }
+})

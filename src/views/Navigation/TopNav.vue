@@ -37,10 +37,10 @@
           </div>
           <div class="border-r-2 pl-2 border-gray-500 ml-2 pr-2 text-end">
             <p class="text-sm text-gray-200 font-bold text-white uppercase">
-              {{ user.name }}
+              {{ user?.name || 'Not save name' }}
             </p>
             <p class="text-xs text-yellow-600 text-nowrap first-letter:uppercase">
-              {{ user.roleName }}
+              {{ user?.roleName || 'note save roleName' }}
             </p>
           </div>
           <RouterLink
@@ -316,7 +316,7 @@ import WarehouseDropdown from "@/views/Component/WarehouseDropdown.vue";
 const emits = defineEmits(["openDrawer", "warehouseChanged"]);
 const route = useRoute();
 const currentPath = computed(() => route.path);
-const user = JSON.parse(localStorage.getItem("user"));
+const user = ref(null);
 const lastScrollY = ref(0);
 const hideNav = ref(localStorage.getItem("primaryNavHidden") === "true" || false);
 const hasShownAlert = ref(false);
@@ -427,8 +427,8 @@ const logOut = async () => {
       },
     });
 
-    const response = await axios.post("logout");
-
+    await sessionStore.logout();
+    // window.location.reload();   
     if (response) {
       const theme = localStorage.getItem("theme");
       localStorage.clear();
@@ -580,6 +580,12 @@ const checkPrimaryHidden = () => {
 };
 
 onMounted(() => {
+    // 1. Ensure we have the latest data from the server
+  // 2. Assign the state value to your local ref
+  user.value = sessionStore.user.user; 
+  console.log("topNav ")
+  console.log(user.value.name)
+
   window.addEventListener("scroll", handleScroll);
   window.addEventListener("click", handleClickOutside);
   startClock();
@@ -596,6 +602,8 @@ onMounted(() => {
     );
     if (openDropdown) adjustDropdownPosition(openDropdown);
   });
+
+  
 });
 
 onUnmounted(() => {

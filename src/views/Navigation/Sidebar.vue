@@ -128,9 +128,9 @@
           class="w-12 h-12 rounded-full border-2 border-slate-500"
         />
         <div class="ms-4">
-          <p class="text-lg font-bold text-white uppercase">{{ user.name }}</p>
+          <p class="text-lg font-bold text-white uppercase">{{ user?.name || 'User name not saved'}}</p>
           <!-- <p class="text-sm text-gray-300 text-white">{{ user.roleName }}</p> -->
-          <p class="text-xs text-gray-300 text-white">{{ user.email }}</p>
+          <p class="text-xs text-gray-300 text-white">{{ user?.email || 'User email not saved' }}</p>
           <div class="flex flex-row gap-2">
             <RouterLink to="/profile">
               <button
