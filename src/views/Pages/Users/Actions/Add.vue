@@ -123,11 +123,7 @@ const register = async () => {
     });
 
     const formData = FormDx(form.value);
-    const response = await axios.post(
-      `${VUE_APP_API_URL}/user/register`,
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post(`api/user/register`, formData);
 
     // Close processing alert
     Swal.close();
