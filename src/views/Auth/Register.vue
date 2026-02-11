@@ -120,7 +120,7 @@ const togglePasswordVisibility = () => {
 const register = async () => {
   try {
     const formData = FormDx(form.value);
-    const response = await axios.post(`${VUE_APP_API_URL}register`, formData);
+    const response = await axios.post(`${VUE_APP_API_URL}/register`, formData);
 
     if (response.data && response.data.token && response.data.userInfo) {
       const { token, userInfo } = response.data;

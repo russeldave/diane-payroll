@@ -197,9 +197,24 @@ const getPermissions = async () => {
     return []; // You may want to handle errors more gracefully based on your use case
   }
 };
+const getRoles = async () => {
+  try {
+    const formData = FormDx({ id: 0 });
+    const response = await axios.post(`api/roles/all-roles-dropdown`, formData);
+    if (response) {
+      const encryptedData = response.data.roles;
+      localStorage.setItem("ro-001", JSON.stringify(encryptedData));
+    }
+  } catch (error) {
+    // Handle the error (log, throw, etc.)
+    console.error("Error fetching list roles:", error);
+    return []; // You may want to handle errors more gracefully based on your use case
+  }
+};
 // Call listUsers when component is mounted
 onMounted(() => {
   listUsers();
   getPermissions();
+  getRoles();
 });
 </script>

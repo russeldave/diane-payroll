@@ -116,7 +116,7 @@ const listPermissions = async () => {
   try {
     const formData = FormDx({ encryption_key: "Joke!" });
     const response = await axios.post(
-      `${VUE_APP_API_URL}permissions/list-no-page`,
+      `${VUE_APP_API_URL}/permissions/list-no-page`,
       formData,
       BearToken(token)
     );

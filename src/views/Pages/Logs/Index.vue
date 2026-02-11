@@ -120,7 +120,7 @@ const listSystemLogs = async () => {
     loading.value = true;
     const formData = FormDx(search.value);
     const response = await axios.post(
-      `${VUE_APP_API_URL}logs/list`,
+      `${VUE_APP_API_URL}/logs/list`,
       formData,
       BearToken(token)
     );

@@ -113,6 +113,9 @@ import { hasPermission } from "@/views/Utility/Permissions";
 import Add from "./Actions/Add.vue";
 import View from "./Actions/View.vue";
 import Edit from "./Actions/Edit.vue";
+// import Accountability from "./Actions/Accountability.vue";
+// import Loader from "@/views/Component/Loader.vue";
+// import Barcode from "./Actions/Barcode.vue";
 
 const token = localStorage.getItem("token");
 const data = ref([]);
@@ -133,7 +136,7 @@ const listEmployee = async () => {
     loading.value = true;
     const formData = FormDx(search.value);
     const response = await axios.post(
-      VUE_APP_API_URL + "employees/list",
+      VUE_APP_API_URL + "/employees/list",
       formData,
       BearToken(token)
     );

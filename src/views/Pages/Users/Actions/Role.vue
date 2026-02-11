@@ -45,9 +45,11 @@
             <label for="LeagueName" class="block text-sm font-medium text-gray-700"
               >Role</label
             >
+            {{ console.log(roles) }}
+
             <select class="mt-1 p-2 border rounded-md w-full" v-model="usersForm.role_id">
               <option value="0">--Select Role--</option>
-              <option v-for="(r, rr) in roles" :key="rr" :value="r.value">
+              <option v-for="r in roles" :key="r.value" :value="r.value">
                 {{ r.label }}
               </option>
             </select>
@@ -92,7 +94,7 @@ const usersForm = ref({
   user_id: 0,
   user_name: "",
   role_id: 0,
-  zoho_user_id: ''
+  zoho_user_id: "",
 });
 
 const assignButtonBehavior = () => {
@@ -107,16 +109,16 @@ const resetForm = () => {
     user_id: 0,
     user_name: "",
     role_id: 0,
-  zoho_user_id: ''
+    zoho_user_id: "",
   };
-}
+};
 const fillForm = () => {
   const data = props.data;
   console.log(data);
   usersForm.value.user_id = data.id;
   usersForm.value.user_name = data.name;
   usersForm.value.role_id = data.roleId;
-  usersForm.value.zoho_user_id = data.zohoUserId
+  usersForm.value.zoho_user_id = data.zohoUserId;
 };
 const assignRole = async () => {
   try {
@@ -133,7 +135,7 @@ const assignRole = async () => {
 
     const formData = FormDx(usersForm.value);
     const response = await axios.post(
-      `${VUE_APP_API_URL}users/assign-role`,
+      `${VUE_APP_API_URL}/users/assign-role`,
       formData,
       BearToken(token)
     );
@@ -151,7 +153,7 @@ const assignRole = async () => {
   }
 };
 
-const roleDropdown = async () => {
-  roles.value = await ROLE();
+const roleDropdown = () => {
+  roles.value = JSON.parse(localStorage.getItem("ro-001"));
 };
 </script>
