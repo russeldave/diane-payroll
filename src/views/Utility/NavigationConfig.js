@@ -336,6 +336,21 @@ export const navigationConfig = {
           permission: "Navigation_Logs",
           group: "Account Management"
         },
+        {
+          title: "Employees Time Settings",
+          icon: "fa-sliders",
+          route: "/employeetimesettings",
+          permission: "Navigation_Employees",
+          group: "System Configuration"
+        },
+        {
+          title: "Attendance Logs",
+          icon: "fa-sliders",
+          route: "/attendancelogs",
+          permission: "Navigation_Employees",
+          group: "System Configuration"
+        }
+
       ],
     },
   ],

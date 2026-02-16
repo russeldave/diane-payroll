@@ -16,6 +16,8 @@ import UsersMain from '@/views/Pages/Users/Index.vue';
 import LogsMain from '@/views/Pages/Logs/Index.vue';
 import ProfileMain from '@/views/Pages/Profile/Index.vue';
 import EmployeesMain from '@/views/Pages/Employee/Index.vue';
+import EmployeeTimeSettingsMain from '@/views/Pages/EmployeeTimeSettings/Index.vue';
+import AttendanceLogsMain from '@/views/Pages/AttendanceLogs/Index.vue'
 // import SystemInformation from '@/views/Pages/SystemInfo/Index.vue';
 
 // Misc
@@ -85,7 +87,29 @@ const routes = [
         name: 'configurations',
         component: ConfigurationMain,
         meta: { title: titleFormat('Configurations'), auth: true }
-      }
+      },
+      {
+        path: 'employeetimesettings',
+        name: 'employeetimesettings',
+        component: EmployeeTimeSettingsMain,
+        meta: { title: titleFormat('Employee Time Settings '), auth: true }
+
+      },
+      {
+        path: 'attendancelogs',
+        name: 'attendancelogs',
+        component: AttendanceLogsMain,
+        meta: { title: titleFormat('Attendance Logs'), auth: true }
+
+      },
+      {
+        path: 'dailyattendance',
+        name: 'dailyattendance',
+        component: DailyAttendanceMain,
+        meta: { title: titleFormat('Daily Attendance'), auth: true }
+
+      },
+
     ]
   },
 

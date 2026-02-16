@@ -22,9 +22,7 @@
       <form class="mt-4" @submit.prevent="addCategory()">
         <div class="grid grid-cols-1 gap-6">
           <div class="mb-4">
-            <label
-              for="LeagueName"
-              class="block text-sm font-medium text-gray-700"
+            <label for="LeagueName" class="block text-sm font-medium text-gray-700"
               >Category Name</label
             >
             <input
@@ -36,15 +34,13 @@
             />
           </div>
           <div class="mb-4">
-            <label
-              for="LeagueName"
-              class="block text-sm font-medium text-gray-700"
+            <label for="LeagueName" class="block text-sm font-medium text-gray-700"
               >Remarks</label
             >
             <textarea
-             v-model="categoryForm.remarks"
-            placeholder="Input Brand Remarks"
-            class="mt-1 p-2 border rounded-md w-full"
+              v-model="categoryForm.remarks"
+              placeholder="Input Brand Remarks"
+              class="mt-1 p-2 border rounded-md w-full"
             ></textarea>
           </div>
         </div>
@@ -68,13 +64,19 @@ import axios from "axios";
 import Modal from "@/views/Component/Modal.vue";
 import Paginator from "@/views/Component/Pagination.vue";
 import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
-import { VUE_APP_API_URL, PERMISSION, BUILDING, WAREHOUSE, CATEGORIES } from "@/views/Utility/Global";
+import {
+  VUE_APP_API_URL,
+  PERMISSION,
+  BUILDING,
+  WAREHOUSE,
+  CATEGORIES,
+} from "@/views/Utility/Global";
 import {
   FormDx,
   BearToken,
   Alert,
   replaceUnderScore,
-  handleApiError
+  handleApiError,
 } from "@/views/Utility/Helper";
 import { getCategories } from "@/views/Utility/PreProcess";
 
@@ -82,16 +84,16 @@ const emits = defineEmits(["transaction_id"]);
 const token = localStorage.getItem("token");
 const isAddModalOpen = ref(false);
 const warehouse = ref([]);
-const categories  = ref([]);
+const categories = ref([]);
 const categoryForm = ref({
   category_id: 0,
-  category_name: '',
-  remarks: '',
+  category_name: "",
+  remarks: "",
 });
 const resetForm = () => {
   categoryForm.value.category_id = 0;
-  categoryForm.value.category_name = '';
-  categoryForm.value.remarks = '';
+  categoryForm.value.category_name = "";
+  categoryForm.value.remarks = "";
 };
 
 const addCategory = async () => {
