@@ -11,6 +11,7 @@
         type="search"
         placeholder="Search Shift..."
         v-model="search"
+        @input.prevent="searchInput"
         class="shadow shadow-gray-400 w-full md:w-1/3 font-semibold text-md py-2 px-4 rounded-lg mb-4 md:mb-0"
       />
 
@@ -30,28 +31,56 @@
         <thead
           class="text-white shadow bg-gradient-to-l from-[#4B0082] via-blue-600 via-blue-700 via-blue-500 via-blue-700 to-[#4B0082]"
         >
-          <tr class="border-b-2 border-yellow-500">
-            <th class="px-6 py-3 border">Shift Name</th>
-            <th class="px-6 py-3 border">Type</th>
-            <th class="px-6 py-3 border">Max Early</th>
-            <th class="px-6 py-3 border">Time In</th>
-            <th class="px-6 py-3 border">Time Out</th>
-            <th class="px-6 py-3 border">Max Out</th>
-            <th class="px-6 py-3 border text-center">Actions</th>
+          <tr class="border-b-2 text-left border-yellow-500">
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Shift Name
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Type
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Max Early
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Time In
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Time Out
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Max Out
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            >
+              Actions
+            </th>
           </tr>
         </thead>
 
         <!-- BODY -->
         <tbody class="divide-y divide-gray-200 text-sm">
-          <tr v-for="shift in filteredShifts" :key="shift.id" class="hover:bg-gray-50">
-            <td class="px-6 py-4">{{ shift.shift_name }}</td>
-            <td class="px-6 py-4">{{ shift.type }}</td>
+          <tr v-for="shift in paginatedShifts" :key="shift.id" class="hover:bg-gray-50">
+            <td class="px-6 py-4 border">{{ shift.shift_name }}</td>
+            <td class="px-6 py-4 border">{{ shift.type }}</td>
 
             <!-- AM/PM FORMATTED TIMES -->
-            <td class="px-6 py-4">{{ formatTime(shift.max_early) }}</td>
-            <td class="px-6 py-4">{{ formatTime(shift.time_in) }}</td>
-            <td class="px-6 py-4">{{ formatTime(shift.time_out) }}</td>
-            <td class="px-6 py-4">{{ formatTime(shift.max_out) }}</td>
+            <td class="px-6 py-4 border">{{ formatTime(shift.max_early) }}</td>
+            <td class="px-6 py-4 border">{{ formatTime(shift.time_in) }}</td>
+            <td class="px-6 py-4 border">{{ formatTime(shift.time_out) }}</td>
+            <td class="px-6 py-4 border">{{ formatTime(shift.max_out) }}</td>
 
             <!-- ACTIONS -->
             <td class="px-6 py-4 text-center">
@@ -77,12 +106,31 @@
             </td>
           </tr>
 
-          <tr v-if="filteredShifts.length === 0">
+          <tr v-if="loading">
+            <td colspan="7" class="text-center py-6">
+              <div class="flex justify-center items-center">
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
+                ></div>
+                <span class="ml-2">Loading...</span>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="paginatedShifts.length === 0 && !loading">
             <td colspan="7" class="text-center py-6 text-gray-400">No shifts found.</td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <!-- PAGINATION -->
+    <Pagination
+      v-if="filteredShifts.length > 0"
+      :page_number="pagination.page_num"
+      :total_rows="filteredShifts.length"
+      :itemsperpage="pagination.itemsperpage"
+      @page_num="handlePagination"
+    />
 
     <!-- MODALS -->
     <CreateShift ref="createShiftRef" @refresh="fetchShifts" />
@@ -95,6 +143,7 @@
 import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
+import Pagination from "@/views/Component/Pagination.vue";
 
 import CreateShift from "@/views/Pages/EmployeeTimeSettings/Action/Add.vue";
 import View from "@/views/Pages/EmployeeTimeSettings/Action/View.vue";
@@ -104,22 +153,97 @@ import Delete from "@/views/Pages/EmployeeTimeSettings/Action/Delete.vue";
 /* ================= STATE ================= */
 const shifts = ref([]);
 const search = ref("");
+const loading = ref(false);
+
+const pagination = ref({
+  page_num: 1,
+  itemsperpage: 10,
+});
 
 const createShiftRef = ref(null);
 const viewRef = ref(null);
 const editRef = ref(null);
 
-/* ================= FETCH SHIFTS ================= */
+/* ================= COMPUTED ================= */
+
+// Filter shifts based on search
+const filteredShifts = computed(() => {
+  if (!search.value) return shifts.value;
+
+  const searchTerm = search.value.toLowerCase();
+  return shifts.value.filter(
+    (shift) =>
+      shift.shift_name?.toLowerCase().includes(searchTerm) ||
+      shift.type?.toLowerCase().includes(searchTerm)
+  );
+});
+
+// Paginate the filtered shifts
+const paginatedShifts = computed(() => {
+  const start = (pagination.value.page_num - 1) * pagination.value.itemsperpage;
+  const end = start + pagination.value.itemsperpage;
+  return filteredShifts.value.slice(start, end);
+});
+
+/* ================= FUNCTIONS ================= */
+
+// Debounced search
+const searchInput = () => {
+  pagination.value.page_num = 1; // Reset to first page on search
+};
+
+// Handle pagination
+const handlePagination = (page_num) => {
+  pagination.value.page_num = page_num ?? 1;
+};
+
+// Fetch shifts
 const fetchShifts = async () => {
   try {
-    const response = await axios.post(
-      "http://localhost:8995/api/employee-time-settings/list",
-      {}
-    );
+    loading.value = true;
 
-    shifts.value = response.data.employeeTimeSettings || [];
+    // Try to get paginated data from API if available
+    try {
+      const response = await axios.post(
+        "http://localhost:8995/api/employee-time-settings/list",
+        {
+          search: search.value,
+          page_num: pagination.value.page_num,
+          itemsperpage: pagination.value.itemsperpage,
+        }
+      );
+
+      // Check if API supports pagination
+      if (
+        response.data &&
+        response.data.employeeTimeSettings &&
+        response.data.total !== undefined
+      ) {
+        // API returns paginated data
+        shifts.value = response.data.employeeTimeSettings;
+        // You might need to adjust pagination total based on API response
+      } else if (response.data && response.data.employeeTimeSettings) {
+        // API returns all data
+        shifts.value = response.data.employeeTimeSettings;
+      } else if (Array.isArray(response.data)) {
+        shifts.value = response.data;
+      } else {
+        shifts.value = response.data?.employeeTimeSettings || [];
+      }
+    } catch (error) {
+      // If paginated endpoint fails, try the regular endpoint
+      console.log("Falling back to regular endpoint");
+      const response = await axios.post(
+        "http://localhost:8995/api/employee-time-settings/list",
+        {}
+      );
+      shifts.value = response.data.employeeTimeSettings || [];
+    }
+
+    loading.value = false;
   } catch (error) {
     console.error("Fetch error:", error.response?.data || error);
+    loading.value = false;
   }
 };
 
@@ -127,27 +251,20 @@ const fetchShifts = async () => {
 const formatTime = (time) => {
   if (!time) return "";
 
-  const parts = time.split(":");
-  let hours = parseInt(parts[0]);
-  const minutes = parts[1];
+  try {
+    const parts = time.split(":");
+    let hours = parseInt(parts[0]);
+    const minutes = parts[1];
 
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  hours = hours ? hours : 12;
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12;
 
-  return `${hours}:${minutes} ${ampm}`;
+    return `${hours}:${minutes} ${ampm}`;
+  } catch (e) {
+    return time;
+  }
 };
-
-/* ================= SEARCH FILTER ================= */
-const filteredShifts = computed(() => {
-  if (!search.value) return shifts.value;
-
-  return shifts.value.filter(
-    (shift) =>
-      shift.shift_name?.toLowerCase().includes(search.value.toLowerCase()) ||
-      shift.type?.toLowerCase().includes(search.value.toLowerCase())
-  );
-});
 
 /* ================= OPEN CREATE MODAL ================= */
 const openCreateShift = () => {
@@ -155,5 +272,7 @@ const openCreateShift = () => {
 };
 
 /* ================= MOUNT ================= */
-onMounted(fetchShifts);
+onMounted(() => {
+  fetchShifts();
+});
 </script>

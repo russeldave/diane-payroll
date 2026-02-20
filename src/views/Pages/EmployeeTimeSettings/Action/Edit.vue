@@ -105,8 +105,10 @@ const form = ref({
   max_out: "",
 });
 
-/* ================= OPEN MODAL ================= */
+/* ================= OPEN MODAL (FIXED) ================= */
 const openModal = async (id) => {
+  show.value = true; // ✅ OPEN MODAL IMMEDIATELY
+
   try {
     const response = await axios.post(
       "http://localhost:8995/api/employee-time-settings/view",
@@ -125,8 +127,6 @@ const openModal = async (id) => {
       time_out: data.time_out || "",
       max_out: data.max_out || "",
     };
-
-    show.value = true;
   } catch (error) {
     console.error("Load error:", error.response?.data || error);
   }

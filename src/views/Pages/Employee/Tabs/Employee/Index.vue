@@ -13,12 +13,12 @@
     />
   </div>
   <div class="flex w-full overflow-auto">
-    <table class="min-w-full divide-y divide-gray-200">
+    <table class="min-w-full divide-y border divide-gray-200">
       <thead class="text-white shadow text-nowrap" :class="DEFAULT_BG">
         <tr class="border-b-2 border-solid border-yellow-500 text-nowrap">
           <th
             scope="col"
-            class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+            class="px-6 py-3 border text-left text-xs font-medium uppercase"
           >
             Employee ID
           </th>

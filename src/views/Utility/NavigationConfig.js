@@ -349,7 +349,14 @@ export const navigationConfig = {
           route: "/attendancelogs",
           permission: "Navigation_Employees",
           group: "System Configuration"
-        }
+        },
+        {
+          title: "Daily Attendance",
+          icon: "fa-sliders",
+          route: "/dailyattendance",
+          permission: "Navigation_Employees",
+          group: "System Configuration"
+        },
 
       ],
     },

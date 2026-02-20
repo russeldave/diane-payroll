@@ -17,7 +17,8 @@ import LogsMain from '@/views/Pages/Logs/Index.vue';
 import ProfileMain from '@/views/Pages/Profile/Index.vue';
 import EmployeesMain from '@/views/Pages/Employee/Index.vue';
 import EmployeeTimeSettingsMain from '@/views/Pages/EmployeeTimeSettings/Index.vue';
-import AttendanceLogsMain from '@/views/Pages/AttendanceLogs/Index.vue'
+import AttendanceLogsMain from '@/views/Pages/AttendanceLogs/Index.vue';
+import DailyAttendanceMain from '@/views/Pages/DailyAttendance/Index.vue'
 // import SystemInformation from '@/views/Pages/SystemInfo/Index.vue';
 
 // Misc

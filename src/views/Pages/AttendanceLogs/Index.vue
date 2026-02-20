@@ -13,6 +13,7 @@
         <input
           type="search"
           v-model="search"
+          @input.prevent="searchInput()"
           placeholder="Search employee name..."
           class="shadow shadow-gray-400 w-full md:w-1/3 font-semibold text-md py-2 px-4 rounded-lg mb-4 md:mb-0"
         />
@@ -34,25 +35,47 @@
             class="text-white shadow bg-gradient-to-l from-[#4B0082] via-blue-600 via-blue-700 via-blue-500 via-blue-700 to-[#4B0082]"
           >
             <tr class="border-b-2 border-yellow-500">
-              <th class="px-6 py-3 border text-left">ID</th>
-              <th class="px-6 py-3 border text-left">Name</th>
-              <th class="px-6 py-3 border text-left">Date Time</th>
+              <th
+                class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+              >
+                ID
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+              >
+                Name
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+              >
+                Date Time
+              </th>
             </tr>
           </thead>
 
           <!-- TABLE BODY -->
           <tbody class="bg-white divide-y divide-gray-200 text-sm">
             <tr
-              v-for="log in filteredLogs"
+              v-for="log in paginatedLogs"
               :key="log.id"
               class="hover:bg-gray-100 transition"
             >
               <td class="px-6 py-3 border">{{ log.id }}</td>
               <td class="px-6 py-3 border">{{ log.name }}</td>
-              <td class="px-6 py-3 border">{{ log.datetime }}</td>
+              <td class="px-6 py-3 border">{{ formatDateTime(log.datetime) }}</td>
             </tr>
 
-            <tr v-if="filteredLogs.length === 0">
+            <tr v-if="loading">
+              <td colspan="3" class="text-center py-6">
+                <div class="flex justify-center items-center">
+                  <div
+                    class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"
+                  ></div>
+                  <span class="ml-2">Loading...</span>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="paginatedLogs.length === 0 && !loading">
               <td colspan="3" class="text-center py-6 text-gray-500">
                 No attendance logs found
               </td>
@@ -60,6 +83,15 @@
           </tbody>
         </table>
       </div>
+
+      <!-- PAGINATION -->
+      <Pagination
+        v-if="filteredLogs.length > 0"
+        :page_number="pagination.page_num"
+        :total_rows="filteredLogs.length"
+        :itemsperpage="pagination.itemsperpage"
+        @page_num="handlePagination"
+      />
     </div>
 
     <!-- ADD MODAL -->
@@ -72,44 +104,126 @@ import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
 import AddLog from "./Action/Add.vue";
+import Pagination from "@/views/Component/Pagination.vue";
 
 /* ================= STATE ================= */
 
 const logs = ref([]);
 const search = ref("");
+const loading = ref(false);
 const addModal = ref(null);
 
-/* ================= FETCH LOGS ================= */
+const pagination = ref({
+  page_num: 1,
+  itemsperpage: 10,
+});
 
-const fetchLogs = async () => {
+/* ================= COMPUTED ================= */
+
+// Filter logs based on search
+const filteredLogs = computed(() => {
+  if (!search.value) return logs.value;
+
+  const searchTerm = search.value.toLowerCase();
+  return logs.value.filter((log) => log.name?.toLowerCase().includes(searchTerm));
+});
+
+// Paginate the filtered logs
+const paginatedLogs = computed(() => {
+  const start = (pagination.value.page_num - 1) * pagination.value.itemsperpage;
+  const end = start + pagination.value.itemsperpage;
+  return filteredLogs.value.slice(start, end);
+});
+
+/* ================= FUNCTIONS ================= */
+
+// Format datetime
+const formatDateTime = (datetime) => {
+  if (!datetime) return "—";
   try {
-    const response = await axios.get("http://localhost:8995/api/attendance-logs");
-
-    logs.value = response.data || [];
-  } catch (error) {
-    console.error("Fetch logs error:", error.response?.data || error);
+    return new Date(datetime).toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    });
+  } catch (e) {
+    return datetime;
   }
 };
 
-/* ================= OPEN ADD MODAL ================= */
+// Debounced search
+const searchInput = () => {
+  pagination.value.page_num = 1; // Reset to first page on search
+};
 
+// Handle pagination
+const handlePagination = (page_num) => {
+  pagination.value.page_num = page_num ?? 1;
+};
+
+// Fetch logs
+const fetchLogs = async () => {
+  try {
+    loading.value = true;
+
+    // Try to get paginated data from API if available
+    try {
+      const response = await axios.get("http://localhost:8995/api/attendance-logs", {
+        params: {
+          search: search.value,
+          page: pagination.value.page_num,
+          limit: pagination.value.itemsperpage,
+        },
+      });
+
+      // Check if API supports pagination
+      if (response.data && response.data.logs && response.data.total !== undefined) {
+        // API returns paginated data
+        logs.value = response.data.logs;
+        // You might need to adjust this based on your API response structure
+      } else if (Array.isArray(response.data)) {
+        // API returns all data, we'll paginate on frontend
+        logs.value = response.data;
+      } else {
+        logs.value = response.data || [];
+      }
+    } catch (error) {
+      // If paginated endpoint fails, try the regular endpoint
+      console.log("Falling back to regular endpoint");
+      const response = await axios.get("http://localhost:8995/api/attendance-logs");
+      logs.value = response.data || [];
+    }
+
+    loading.value = false;
+  } catch (error) {
+    console.error("Fetch logs error:", error.response?.data || error);
+    loading.value = false;
+  }
+};
+
+// Open add modal
 const openAddModal = () => {
   if (addModal.value) {
     addModal.value.openModal();
   }
 };
 
-/* ================= SEARCH FILTER ================= */
+/* ================= WATCHERS ================= */
 
-const filteredLogs = computed(() => {
-  if (!search.value) return logs.value;
-
-  return logs.value.filter((log) =>
-    log.name?.toLowerCase().includes(search.value.toLowerCase())
-  );
-});
+// Watch for search changes to reset pagination
+// (Already handled in searchInput)
 
 /* ================= LOAD ON MOUNT ================= */
 
-onMounted(fetchLogs);
+onMounted(() => {
+  fetchLogs();
+});
 </script>
+
+<style scoped>
+/* Add any custom styles here if needed */
+</style>

@@ -85,6 +85,8 @@ const form = ref({
 });
 
 const openModal = async (id) => {
+  show.value = true; // ✅ OPEN MODAL IMMEDIATELY
+
   try {
     const response = await axios.post(
       "http://localhost:8995/api/employee-time-settings/view",
@@ -92,7 +94,6 @@ const openModal = async (id) => {
     );
 
     form.value = response.data.employeeTimeSetting;
-    show.value = true;
   } catch (error) {
     console.error(error.response?.data || error);
   }
