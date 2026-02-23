@@ -101,7 +101,11 @@
                   Edit
                 </button>
 
-                <Delete :id="shift.id" @refresh="fetchShifts" />
+                <Delete
+                  :id="shift.id"
+                  :shiftName="shift.shift_name"
+                  @refresh="fetchShifts"
+                />
               </div>
             </td>
           </tr>
@@ -140,10 +144,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import axios from "axios";
 import BreadCrumbs from "@/views/Component/BreadCrumbs.vue";
 import Pagination from "@/views/Component/Pagination.vue";
+import Swal from "sweetalert2";
 
 import CreateShift from "@/views/Pages/EmployeeTimeSettings/Action/Add.vue";
 import View from "@/views/Pages/EmployeeTimeSettings/Action/View.vue";
@@ -190,11 +195,13 @@ const paginatedShifts = computed(() => {
 // Debounced search
 const searchInput = () => {
   pagination.value.page_num = 1; // Reset to first page on search
+  fetchShifts(); // Re-fetch with search term
 };
 
 // Handle pagination
 const handlePagination = (page_num) => {
   pagination.value.page_num = page_num ?? 1;
+  fetchShifts(); // Re-fetch with new page
 };
 
 // Fetch shifts
@@ -202,74 +209,69 @@ const fetchShifts = async () => {
   try {
     loading.value = true;
 
-    // Try to get paginated data from API if available
-    try {
-      const response = await axios.post(
-        "http://localhost:8995/api/employee-time-settings/list",
-        {
-          search: search.value,
-          page_num: pagination.value.page_num,
-          itemsperpage: pagination.value.itemsperpage,
-        }
-      );
-
-      // Check if API supports pagination
-      if (
-        response.data &&
-        response.data.employeeTimeSettings &&
-        response.data.total !== undefined
-      ) {
-        // API returns paginated data
-        shifts.value = response.data.employeeTimeSettings;
-        // You might need to adjust pagination total based on API response
-      } else if (response.data && response.data.employeeTimeSettings) {
-        // API returns all data
-        shifts.value = response.data.employeeTimeSettings;
-      } else if (Array.isArray(response.data)) {
-        shifts.value = response.data;
-      } else {
-        shifts.value = response.data?.employeeTimeSettings || [];
+    const response = await axios.post(
+      "http://localhost:8995/api/employee-time-settings/list",
+      {
+        search: search.value || undefined,
+        page: pagination.value.page_num,
+        per_page: pagination.value.itemsperpage,
       }
-    } catch (error) {
-      // If paginated endpoint fails, try the regular endpoint
-      console.log("Falling back to regular endpoint");
-      const response = await axios.post(
-        "http://localhost:8995/api/employee-time-settings/list",
-        {}
-      );
-      shifts.value = response.data.employeeTimeSettings || [];
+    );
+
+    // Handle response
+    if (response.data && response.data.employeeTimeSettings) {
+      shifts.value = response.data.employeeTimeSettings;
+    } else if (Array.isArray(response.data)) {
+      shifts.value = response.data;
+    } else {
+      shifts.value = response.data || [];
     }
 
     loading.value = false;
   } catch (error) {
     console.error("Fetch error:", error.response?.data || error);
+
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.response?.data?.message || "Failed to fetch shifts",
+    });
+
     loading.value = false;
   }
 };
 
-/* ================= FORMAT TIME TO AM/PM ================= */
+/* ================= FORMAT TIME TO 24-HOUR FORMAT ================= */
 const formatTime = (time) => {
   if (!time) return "";
 
   try {
-    const parts = time.split(":");
-    let hours = parseInt(parts[0]);
-    const minutes = parts[1];
+    // If it's already in the format we want, return as is
+    if (typeof time === "string") {
+      // Check if it's already in HH:MM format
+      const parts = time.split(":");
+      if (parts.length >= 2) {
+        const hours = parts[0].padStart(2, "0");
+        const minutes = parts[1].padStart(2, "0");
+        return `${hours}:${minutes}`;
+      }
+    }
 
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-
-    return `${hours}:${minutes} ${ampm}`;
+    return time;
   } catch (e) {
     return time;
   }
 };
-
 /* ================= OPEN CREATE MODAL ================= */
 const openCreateShift = () => {
   createShiftRef.value.openShiftModal();
 };
+
+/* ================= WATCH SEARCH ================= */
+watch(search, () => {
+  pagination.value.page_num = 1;
+  fetchShifts();
+});
 
 /* ================= MOUNT ================= */
 onMounted(() => {

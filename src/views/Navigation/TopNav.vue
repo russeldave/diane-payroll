@@ -4,7 +4,6 @@
       <!-- Primary Navigation -->
       <div
         class="flex justify-between items-center gap-6 p-2 primary-nav bg-gradient-to-l from-black via-red-600 via-red-700 via-red-500 via-red-700 to-[#800000]"
-        :class="{ hidden: hideNav }"
       >
         <!-- Logo -->
         <div class="flex justify-start flex-col ml-3">
@@ -82,8 +81,7 @@
         </div>
       </div>
       <div
-        class="relative flex h-full p-1 items-center justify-center min-w-screen secondary-nav"
-        :class="DEFAULT_BG"
+        class="relative flex h-full p-1 items-center justify-center min-w-screen secondary-nav bg-green-700"
       >
         <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
           <!-- Mobile menu button-->

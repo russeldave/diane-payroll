@@ -69,6 +69,20 @@
         </div>
         <div class="mb-4">
           <label for="LeagueName" class="block text-sm font-medium text-gray-700"
+            >Shift Settings</label
+          >
+          <select
+            v-model="form.employee_shift_id"
+            class="mt-1 p-2 border rounded-md w-full"
+          >
+            <option value="0">--Select Shift--</option>
+            <option v-for="(shift, pp) in shifts" :value="shift.value" :key="pp">
+              {{ shift.label }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="LeagueName" class="block text-sm font-medium text-gray-700"
             >Supervisor</label
           >
           <select v-model="form.user_id" class="mt-1 p-2 border rounded-md w-full">
@@ -134,6 +148,7 @@ import { FormDx, BearToken, handleApiError } from "@/views/Utility/Helper";
 const emits = defineEmits(["transaction_id"]);
 const token = localStorage.getItem("token");
 const positions = ref([]);
+const shifts = ref([]);
 const users = ref([]);
 const isAddModalOpen = ref(false); // Control visibility of add product modal
 const form = ref({
@@ -152,6 +167,7 @@ const addEmployeeBehavior = async () => {
   getPositionDropdown();
   getUsersDropdown();
   resetForm();
+  getShiftsDropdown();
 };
 const resetForm = () => {
   form.value = {
@@ -210,6 +226,21 @@ const getPositionDropdown = async () => {
     );
 
     positions.value = response.data.employeePositions;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+const getShiftsDropdown = async () => {
+  try {
+    const formData = FormDx({ id: 0 });
+    positions.value = [];
+    const response = await axios.post(
+      VUE_APP_API_URL + "/employee-time-settings/dropdown",
+      formData,
+      BearToken(token)
+    );
+
+    shifts.value = response.data.shifts;
   } catch (error) {
     handleApiError(error);
   }

@@ -76,6 +76,20 @@
         </div>
         <div class="mb-4">
           <label for="LeagueName" class="block text-sm font-medium text-gray-700"
+            >Shift Settings</label
+          >
+          <select
+            v-model="form.employee_shift_id"
+            class="mt-1 p-2 border rounded-md w-full"
+          >
+            <option value="0">--Select Shift--</option>
+            <option v-for="(shift, index) in shifts" :value="shift.value" :key="index">
+              {{ shift.label }}
+            </option>
+          </select>
+        </div>
+        <div class="mb-4">
+          <label for="LeagueName" class="block text-sm font-medium text-gray-700"
             >Supervisor</label
           >
           <select v-model="form.user_id" class="mt-1 p-2 border rounded-md w-full">
@@ -147,6 +161,7 @@ const props = defineProps({
 });
 const token = localStorage.getItem("token");
 const positions = ref([]);
+const shifts = ref([]);
 const users = ref([]);
 const isEditModalOpen = ref(false); // Control visibility of add product modal
 const form = ref({
@@ -160,6 +175,7 @@ const form = ref({
   address: "",
   remarks: "",
   contact_info: "",
+  employee_shift_id: 0,
 });
 const editEmployeeBehavior = async () => {
   isEditModalOpen.value = true;
@@ -167,6 +183,7 @@ const editEmployeeBehavior = async () => {
   viewForm();
   getPositionDropdown();
   getUsersDropdown();
+  getShiftsDropdown();
 };
 
 const viewForm = () => {
@@ -182,6 +199,7 @@ const viewForm = () => {
     contact_info: data.contactInfo,
     employee_no: data.employeeNumber,
     user_id: data.userId ?? 0,
+    employee_shift_id: data.timeSettingsId,
   };
 };
 const editEmployee = async () => {
@@ -199,11 +217,7 @@ const editEmployee = async () => {
     form.value.date_now = DATE_NOW();
 
     const formData = FormDx(form.value);
-    const response = await axios.post(
-      VUE_APP_API_URL + "employees/edit",
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post("api/employees/edit", formData, BearToken(token));
     if (response.data) {
       Swal.close();
       isEditModalOpen.value = false;
@@ -222,7 +236,7 @@ const getPositionDropdown = async () => {
     const formData = FormDx({ id: 0 });
     positions.value = [];
     const response = await axios.post(
-      VUE_APP_API_URL + "/employee-positions/dropdown",
+      "api/employee-positions/dropdown",
       formData,
       BearToken(token)
     );
@@ -232,15 +246,26 @@ const getPositionDropdown = async () => {
     handleApiError(error);
   }
 };
+const getShiftsDropdown = async () => {
+  try {
+    const formData = FormDx({ id: 0 });
+    positions.value = [];
+    const response = await axios.post(
+      VUE_APP_API_URL + "/employee-time-settings/dropdown",
+      formData,
+      BearToken(token)
+    );
+
+    shifts.value = response.data.shifts;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
 const getUsersDropdown = async () => {
   try {
     const formData = FormDx({ id: 0 });
     users.value = [];
-    const response = await axios.post(
-      VUE_APP_API_URL + "/users/dropdown",
-      formData,
-      BearToken(token)
-    );
+    const response = await axios.post("api/users/dropdown", formData, BearToken(token));
 
     users.value = response.data.users;
   } catch (error) {

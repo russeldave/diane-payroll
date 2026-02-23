@@ -21,15 +21,16 @@
     </template>
 
     <!-- BODY -->
-    <div class="grid grid-cols-1 gap-2 p-4">
+    <div class="p-4">
       <form class="mt-4" @submit.prevent="addShift">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-2 gap-4">
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700"> Shift Name </label>
             <input
               type="text"
               v-model="form.shift_name"
               class="mt-1 p-2 border rounded-md w-full"
+              placeholder="Input shift name"
             />
           </div>
 
@@ -43,19 +44,19 @@
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"> Max Early </label>
+            <label class="block text-sm font-medium text-gray-700"> Time In </label>
             <input
               type="time"
-              v-model="form.max_early"
+              v-model="form.time_in"
               class="mt-1 p-2 border rounded-md w-full"
             />
           </div>
 
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700"> Time In </label>
+            <label class="block text-sm font-medium text-gray-700"> Max Early </label>
             <input
               type="time"
-              v-model="form.time_in"
+              v-model="form.max_early"
               class="mt-1 p-2 border rounded-md w-full"
             />
           </div>

@@ -26,6 +26,12 @@
             scope="col"
             class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
           >
+            Shift
+          </th>
+          <th
+            scope="col"
+            class="px-6 py-3 text-left text-xs md:text-sm font-medium uppercase border tracking-wider"
+          >
             Name
           </th>
           <th
@@ -52,6 +58,9 @@
         <tr v-for="employee in data.employees" :key="employee.id">
           <td class="px-6 py-4 whitespace-nowrap">
             {{ employee.employeeNumber }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            {{ employee.shift_name }}
           </td>
           <td class="px-6 py-4 whitespace-nowrap">
             {{ employee.firstName }} {{ employee.middleName }} {{ employee.lastName }}

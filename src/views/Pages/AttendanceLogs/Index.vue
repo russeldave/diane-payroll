@@ -137,19 +137,18 @@ const paginatedLogs = computed(() => {
 
 /* ================= FUNCTIONS ================= */
 
-// Format datetime
+// UPDATED: Format datetime as YYYY-MM-DD HH:MM
 const formatDateTime = (datetime) => {
   if (!datetime) return "—";
   try {
-    return new Date(datetime).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true,
-    });
+    const date = new Date(datetime);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
   } catch (e) {
     return datetime;
   }
@@ -170,31 +169,13 @@ const fetchLogs = async () => {
   try {
     loading.value = true;
 
-    // Try to get paginated data from API if available
-    try {
-      const response = await axios.get("http://localhost:8995/api/attendance-logs", {
-        params: {
-          search: search.value,
-          page: pagination.value.page_num,
-          limit: pagination.value.itemsperpage,
-        },
-      });
+    const response = await axios.get("http://localhost:8995/api/attendance-logs");
 
-      // Check if API supports pagination
-      if (response.data && response.data.logs && response.data.total !== undefined) {
-        // API returns paginated data
-        logs.value = response.data.logs;
-        // You might need to adjust this based on your API response structure
-      } else if (Array.isArray(response.data)) {
-        // API returns all data, we'll paginate on frontend
-        logs.value = response.data;
-      } else {
-        logs.value = response.data || [];
-      }
-    } catch (error) {
-      // If paginated endpoint fails, try the regular endpoint
-      console.log("Falling back to regular endpoint");
-      const response = await axios.get("http://localhost:8995/api/attendance-logs");
+    if (Array.isArray(response.data)) {
+      logs.value = response.data;
+    } else if (response.data && response.data.data) {
+      logs.value = response.data.data;
+    } else {
       logs.value = response.data || [];
     }
 
@@ -212,18 +193,9 @@ const openAddModal = () => {
   }
 };
 
-/* ================= WATCHERS ================= */
-
-// Watch for search changes to reset pagination
-// (Already handled in searchInput)
-
-/* ================= LOAD ON MOUNT ================= */
+/* ================= MOUNT ================= */
 
 onMounted(() => {
   fetchLogs();
 });
 </script>
-
-<style scoped>
-/* Add any custom styles here if needed */
-</style>

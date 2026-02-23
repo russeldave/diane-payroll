@@ -1,11 +1,6 @@
 <template>
   <nav
-    class="fixed top-0 z-50 w-full shadow shadow-slate-900 overflow-hidden"
-    :class="
-      IS_DEV
-        ? 'bg-red-500'
-        : 'bg-gradient-to-l from-black via-red-600 via-red-700 via-[#800000] to-red-500'
-    "
+    class="fixed top-0 z-50 w-full shadow shadow-slate-900 overflow-hidden bg-green-700"
   >
     <div class="px-1 py-1 lg:px-5 lg:pl-3">
       <div class="flex items-center justify-between">
@@ -111,10 +106,9 @@
     :class="{
       'translate-x-0': isDrawerOpen,
       '-translate-x-full': !isDrawerOpen,
-      'bg-red-500': IS_DEV,
       'p-0': !IS_DEV,
     }"
-    class="fixed top-10 left-0 z-40 w-64 pt-5 h-screen transition-transform border-r overflow-hidden border-gray-200"
+    class="fixed top-10 left-0 z-40 w-64 pt-5 h-screen transition-transform border-r overflow-hidden border-gray-200 bg-green-700"
     aria-label="Sidebar"
   >
     <div
